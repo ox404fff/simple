@@ -12,11 +12,21 @@ abstract class BaseModel extends BaseComponent
 {
 
     /**
-     * Save model
+     * Set table name for auto queries
+     *
+     * @var string
      */
-    public function save()
-    {
+    protected static $tableName;
 
+    /**
+     * Select record from database
+     *
+     * @param $query
+     * @param array $bind
+     */
+    public static function query($query, $bind = [])
+    {
+        self::getConnection()->query($query, $bind);
     }
 
 
@@ -26,9 +36,9 @@ abstract class BaseModel extends BaseComponent
      * @param $query
      * @param array $bind
      */
-    public static function select($query, $bind = [])
+    public static function queryAll($query, $bind = [])
     {
-
+        self::getConnection()->queryAll($query, $bind);
     }
 
 
@@ -37,14 +47,38 @@ abstract class BaseModel extends BaseComponent
      *
      * @param $query
      * @param array $bind
+     * @return bool
      */
-    public static function execute($query, $bind = [])
+    public static function exec($query, $bind = [])
     {
-
+        return self::getConnection()->exec($query, $bind);
     }
 
 
     /**
+     * Insert a new record
+     *
+     * @param $data
+     * @return bool
+     */
+    public static function insert($data)
+    {
+
+        $data['created_at'] = time();
+        $data['updated_at'] = time();
+
+        $bind = [];
+        foreach ($data as $column => $value) {
+            $bind[':'.$column] = $value;
+        }
+
+        return self::exec('INSERT INTO '.static::$tableName.'('.implode(', ', array_keys($data)).') VALUES('.implode(', ', array_keys($bind)).')', $bind);
+    }
+
+
+    /**
+     * Get database connection object
+     *
      * @return components\DBConnection
      */
     public static function getConnection()

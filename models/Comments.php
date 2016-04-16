@@ -10,8 +10,17 @@ namespace models;
 
 use vendor\BaseModel;
 
+/**
+ * Model with comments
+ *
+ * Class Comments
+ * @package models
+ */
 class Comments extends BaseModel
 {
+
+    protected static $tableName = 'comments';
+
 
     /**
      * Find all comments
@@ -19,6 +28,25 @@ class Comments extends BaseModel
     public static function findAll()
     {
         return [];
+    }
+
+
+    /**
+     * Create a new comment
+     *
+     * @param int $parentId
+     * @param string $commentText
+     * @param bool $prepend
+     * @return bool
+     */
+    public static function createNewComment($parentId, $commentText, $prepend = false)
+    {
+
+        self::insert([
+            'message' => 'test',
+        ]);
+
+
     }
 
 }

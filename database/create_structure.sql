@@ -4,7 +4,7 @@ CREATE TABLE comments (
   id_right  bigint NOT NULL DEFAULT 0,
   level  bigint NOT NULL DEFAULT 0,
   message  text NOT NULL,
-  inserted_at  bigint NOT NULL,
+  created_at  bigint NOT NULL,
   updated_at  bigint NOT NULL,
   is_deleted  tinyint NOT NULL DEFAULT 0,
   PRIMARY KEY (id),
