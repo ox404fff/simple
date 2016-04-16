@@ -31,7 +31,8 @@ class Application
      * @var array
      */
     private $_config = [
-        'components' => []
+        'parameters' => [],
+        'components' => [],
     ];
 
 
@@ -104,6 +105,7 @@ class Application
             $this->attachComponent(
                 'controller',
                 'controllers\\' . ucfirst($controller) . 'Controller', [
+                    'title'  => $this->getParameter('title'),
                     'action' => 'action'.ucfirst($action),
                     'id'     => $controller
                 ]
@@ -112,6 +114,18 @@ class Application
             throw new HttpException(404, $e->getMessage());
         }
 
+    }
+
+
+    /**
+     * Get parameter by key
+     *
+     * @param $parameter
+     * @return null|string
+     */
+    public function getParameter($parameter)
+    {
+        return isset($this->_config['parameters'][$parameter]) ? $this->_config['parameters'][$parameter] : null;
     }
 
 

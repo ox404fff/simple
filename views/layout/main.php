@@ -6,9 +6,9 @@
  */
 ?>
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="<?php echo $this->escape(\vendor\Application::getInstance()->getParameter('language')) ?>">
     <head>
-        <meta charset="utf-8">
+        <meta charset="<?php echo $this->escape(\vendor\Application::getInstance()->getParameter('charset')) ?>">
         <title><?php echo $this->escape($title) ?></title>
     </head>
     <body>

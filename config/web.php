@@ -8,6 +8,11 @@
 
 
 return [
+    'parameters' => [
+        'title'    => 'Simple',
+        'language' => 'ru',
+        'charset'  => 'utf-8',
+    ],
     'components' => [
         'db' => [
             'class'     => 'vendor\components\DBConnection',

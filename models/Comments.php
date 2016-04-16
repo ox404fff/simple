@@ -13,4 +13,4 @@ use vendor\BaseModel;
 class Comments extends BaseModel
 {
 
-} 
+}
