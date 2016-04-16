@@ -8,9 +8,9 @@
 
 namespace controllers;
 
-use vendor\SController;
+use vendor\BaseController;
 
-class DefaultController extends SController
+class DefaultController extends BaseController
 {
 
     public function actionIndex()

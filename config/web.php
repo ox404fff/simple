@@ -8,10 +8,13 @@
 
 
 return [
-    'db' => [
-        'dsn'       => 'mysql:host=localhost;dbname=simple',
-        'username'  => 'root',
-        'password'  => '',
-        'charset'   => 'utf8',
+    'components' => [
+        'db' => [
+            'class'     => 'components\DBConnection',
+            'dsn'       => 'mysql:host=localhost;dbname=simple',
+            'username'  => 'root',
+            'password'  => '',
+            'charset'   => 'utf8',
+        ]
     ]
 ];

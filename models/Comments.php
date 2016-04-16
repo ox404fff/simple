@@ -8,9 +8,9 @@
 
 namespace models;
 
-use vendor\SModel;
+use vendor\BaseModel;
 
-class Comments extends SModel
+class Comments extends BaseModel
 {
 
 } 
