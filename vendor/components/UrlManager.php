@@ -38,6 +38,8 @@ class UrlManager extends BaseComponent
 
 
     /**
+     * Default route, if appropriate sections in url is empty
+     *
      * @var array
      */
     public $defaultRoute = ['default', 'index'];

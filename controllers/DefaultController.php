@@ -9,7 +9,8 @@ class DefaultController extends BaseController
 
     public function actionIndex()
     {
-        return $this->render('index');
+        return $this->render('index', [
+        ]);
     }
 
 } 

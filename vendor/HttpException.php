@@ -8,7 +8,7 @@ namespace vendor;
  * Class BaseException
  * @package vendor
  */
-class BaseHttpException extends BaseException
+class HttpException extends BaseException
 {
 
     public function __construct($httpStatusCode)

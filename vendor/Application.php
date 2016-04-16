@@ -1,6 +1,7 @@
 <?php
 
 namespace vendor;
+
 use vendor\components\DBConnection;
 use vendor\components\UrlManager;
 
@@ -90,7 +91,7 @@ class Application
     /**
      * Initialise controller by request
      *
-     * @throws BaseHttpException
+     * @throws HttpException
      *
      * @param UrlManager $urlManager
      */
@@ -102,11 +103,13 @@ class Application
         try {
             $this->attachComponent(
                 'controller',
-                'controllers\\' . ucfirst($controller) . 'Controller',
-                ['action' => 'action'.ucfirst($action)]
+                'controllers\\' . ucfirst($controller) . 'Controller', [
+                    'action' => 'action'.ucfirst($action),
+                    'id'     => $controller
+                ]
             );
         } catch (\Exception $e) {
-            throw new BaseHttpException(404, $e->getMessage());
+            throw new HttpException(404, $e->getMessage());
         }
 
     }
