@@ -102,10 +102,11 @@ class Application
         try {
             $this->attachComponent(
                 'controller',
-                'controllers\\' . ucfirst($controller) . 'Controller', ['action' => $action]
+                'controllers\\' . ucfirst($controller) . 'Controller',
+                ['action' => 'action'.ucfirst($action)]
             );
         } catch (\Exception $e) {
-            throw new BaseHttpException(404);
+            throw new BaseHttpException(404, $e->getMessage());
         }
 
     }

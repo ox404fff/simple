@@ -19,10 +19,16 @@ abstract class BaseController extends BaseComponent
 
     /**
      * Initialise and run controller
+     *
+     * @throws BaseException
      */
     public function init()
     {
-
+        if (method_exists($this, $this->action)) {
+            call_user_func([$this, $this->action]);
+        } else {
+            throw new BaseException('Action "'.$this->action.'" is not found');
+        }
     }
 
 
