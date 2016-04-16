@@ -1,11 +1,7 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: ox404fff
- * Date: 14.04.16
- * Time: 21:13
+ * Application config array
  */
-
 
 return [
     'parameters' => [
@@ -18,7 +14,7 @@ return [
             'class'     => 'vendor\components\DBConnection',
             'dsn'       => 'mysql:host=localhost;dbname=simple',
             'username'  => 'root',
-            'password'  => '',
+            'password'  => 'polkilo',
             'charset'   => 'utf8',
         ],
         'urlManager' => [

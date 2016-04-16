@@ -13,4 +13,12 @@ use vendor\BaseModel;
 class Comments extends BaseModel
 {
 
+    /**
+     * Find all comments
+     */
+    public static function findAll()
+    {
+        return [];
+    }
+
 }
