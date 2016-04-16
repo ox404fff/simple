@@ -10,11 +10,12 @@ class Application
 {
 
     /**
-     * singleton instanse
+     * singleton instance
      *
      * @var static
      */
-    private static $_instanse;
+    private static $_instance;
+
 
     /**
      * Application config array
@@ -23,12 +24,14 @@ class Application
      */
     private $_config = [];
 
+
     /**
      * Array of instances of classes components
      *
      * @var BaseComponent[]
      */
     private $_components = [];
+
 
     /**
      * Singleton
@@ -37,20 +40,19 @@ class Application
      */
     public static function getInstance()
     {
-        if (is_null(self::$_instanse)) {
-            static::$_instanse = new self();
+        if (is_null(self::$_instance)) {
+            static::$_instance = new self();
         }
 
-        return static::$_instanse;
+        return static::$_instance;
     }
-
-
-    private function __clone() {}
-    private function __construct() {}
 
 
     /**
      * Running application
+     *
+     * @param $config
+     * @throws \Exception
      */
     public function run($config)
     {
@@ -62,6 +64,10 @@ class Application
 
     /**
      * Initialise components
+     *
+     * @return bool
+     * @throws BaseException
+     * @throws \Exception
      */
     protected function initComponents()
     {
@@ -121,5 +127,9 @@ class Application
         return true;
 
     }
+
+
+    private function __clone() {}
+    private function __construct() {}
 
 } 
