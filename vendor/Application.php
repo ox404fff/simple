@@ -108,7 +108,7 @@ class Application
                     'id'     => $controller
                 ]
             );
-        } catch (\Exception $e) {
+        } catch (BaseException $e) {
             throw new HttpException(404, $e->getMessage());
         }
 

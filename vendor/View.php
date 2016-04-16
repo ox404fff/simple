@@ -31,12 +31,12 @@ class View extends BaseComponent
      * Setting rendering template path
      *
      * @param $templatePath
-     * @throws BaseException
+     * @throws \Exception
      */
     public function setTemplate($templatePath)
     {
         if (!file_exists($templatePath)) {
-            throw new BaseException('View file "'.$templatePath.'" is not exists');
+            throw new \Exception('View file "'.$templatePath.'" is not exists');
         }
 
         $this->templatePath = $templatePath;

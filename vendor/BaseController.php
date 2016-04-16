@@ -28,11 +28,35 @@ abstract class BaseController extends BaseComponent
 
 
     /**
-     * View instance
+     * Default layout
+     *
+     * @var string
+     */
+    public $layout = 'main';
+
+
+    /**
+     * Application title
+     *
+     * @var string
+     */
+    public $title = '';
+
+
+    /**
+     * View instance for render content
      *
      * @var View
      */
-    protected $view;
+    protected $contentView;
+
+
+    /**
+     * View for render layout
+     *
+     * @var View
+     */
+    protected $layoutView;
 
 
     /**
@@ -46,10 +70,34 @@ abstract class BaseController extends BaseComponent
             throw new BaseException('Action "' . $this->action . '" is not found');
         }
 
-        $this->view = new View();
+        $this->initLayoutView();
+
+        $this->initContentView();
 
         call_user_func([$this, $this->action]);
 
+    }
+
+
+    /**
+     * Initialise layout view object
+     *
+     * @throws \Exception
+     */
+    protected function initLayoutView()
+    {
+        $this->layoutView = new View();
+        $layoutPath = $this->getLayoutPath($this->layout);
+        $this->layoutView->setTemplate($layoutPath);
+    }
+
+
+    /**
+     * Initialise content view object
+     */
+    protected function initContentView()
+    {
+        $this->contentView = new View();
     }
 
 
@@ -64,12 +112,15 @@ abstract class BaseController extends BaseComponent
     public function render($view, $data = [])
     {
         $templatePath = $this->getTemplatePath($view);
+        $this->contentView->setTemplate($templatePath);
+        $this->contentView->setData($data);
+        $content = $this->contentView->getHtml();
 
-        $this->view->setTemplate($templatePath);
-
-        $this->view->setData($data);
-
-        echo $this->view->getHtml();
+        $this->layoutView->setData([
+            'content'  => $content,
+            'title'    => $this->title,
+        ]);
+        echo $this->layoutView->getHtml();
     }
 
 
@@ -83,4 +134,18 @@ abstract class BaseController extends BaseComponent
     {
         return BASE_PATH.'/views/'.$this->id.'/'.$viewFile.'.php';
     }
+
+
+    /**
+     * Getting full path to layout file
+     *
+     * @param $layoutFile
+     * @return string
+     */
+    protected function getLayoutPath($layoutFile)
+    {
+        return BASE_PATH.'/views/layout/'.$layoutFile.'.php';
+    }
+
+
 } 
