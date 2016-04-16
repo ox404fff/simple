@@ -1,9 +1,16 @@
 <?php
 
 namespace vendor;
+use vendor\components\DBConnection;
+use vendor\components\UrlManager;
 
 /**
  * Class Application
+ *
+ * @property UrlManager $urlManager
+ * @property DBConnection $db
+ * @property BaseController $controller
+ *
  * @package vendor
  */
 class Application
@@ -18,11 +25,13 @@ class Application
 
 
     /**
-     * Application config array
+     * Application config
      *
-     * @var
+     * @var array
      */
-    private $_config = [];
+    private $_config = [
+        'components' => []
+    ];
 
 
     /**
@@ -51,32 +60,69 @@ class Application
     /**
      * Running application
      *
-     * @param $config
+     * @param array $config
      * @throws \Exception
      */
     public function run($config)
     {
-        $this->_config = $config;
+        $this->_config = array_merge($this->_config, $config);
 
-        $this->initComponents();
+        $this->initComponents($this->_config['components']);
+
+        $urlManager = $this->getUrlManager();
+
+        $this->initController($urlManager);
+
+    }
+
+
+    /**
+     * Get url manager
+     *
+     * @return UrlManager
+     */
+    public function getUrlManager()
+    {
+        return $this->urlManager;
+    }
+
+
+    /**
+     * Initialise controller by request
+     *
+     * @throws BaseHttpException
+     *
+     * @param UrlManager $urlManager
+     */
+    protected function initController($urlManager)
+    {
+
+        list($controller, $action) = $urlManager->getRoute();
+
+        try {
+            $this->attachComponent(
+                'controller',
+                'controllers\\' . ucfirst($controller) . 'Controller', ['action' => $action]
+            );
+        } catch (\Exception $e) {
+            throw new BaseHttpException(404);
+        }
+
     }
 
 
     /**
      * Initialise components
      *
+     * @param $components
      * @return bool
      * @throws BaseException
      * @throws \Exception
      */
-    protected function initComponents()
+    protected function initComponents($components)
     {
 
-        if (!isset($this->_config['components'])) {
-            return false;
-        }
-
-        foreach ($this->_config['components'] as $name => $component) {
+        foreach ($components as $name => $component) {
             if (!isset($component['class'])) {
                 throw new \Exception('Class must be defined');
             }
@@ -95,8 +141,8 @@ class Application
     /**
      * Attach component
      *
-     * @param $name
-     * @param $class
+     * @param string $name
+     * @param string $class
      * @param array $config
      *
      * @return bool
@@ -121,14 +167,34 @@ class Application
             }
             $this->_components[$name]->{$attribute} = $value;
 
-            $this->_components[$name]->init();
         }
+
+        $this->_components[$name]->init();
 
         return true;
 
     }
 
 
+    /**
+     * Magic getter for getting the component instances
+     *
+     * @param $name
+     * @return null|BaseComponent
+     */
+    public function __get($name)
+    {
+        if (isset($this->_components[$name])) {
+            return $this->_components[$name];
+        }
+
+        return null;
+    }
+
+
+    /**
+     * Singleton
+     */
     private function __clone() {}
     private function __construct() {}
 

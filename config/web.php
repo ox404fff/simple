@@ -10,11 +10,15 @@
 return [
     'components' => [
         'db' => [
-            'class'     => 'components\DBConnection',
+            'class'     => 'vendor\components\DBConnection',
             'dsn'       => 'mysql:host=localhost;dbname=simple',
             'username'  => 'root',
             'password'  => '',
             'charset'   => 'utf8',
+        ],
+        'urlManager' => [
+            'class'     => 'vendor\components\UrlManager',
+            'prettyUrl' => true,
         ]
     ]
 ];

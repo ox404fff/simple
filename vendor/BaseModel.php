@@ -8,7 +8,7 @@ namespace vendor;
  * Class BaseModel
  * @package vendor
  */
-class BaseModel
+abstract class BaseModel extends BaseComponent
 {
 
 } 

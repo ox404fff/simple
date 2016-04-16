@@ -1,14 +1,14 @@
 <?php
 
-namespace components;
+namespace vendor\components;
 
 use vendor\BaseComponent;
 
 /**
- * Connection to database component
+ * Default connection to database component
  *
- * Class BaseModel
- * @package vendor
+ * Class DBConnection
+ * @package vendor\components
  */
 class DBConnection extends BaseComponent
 {

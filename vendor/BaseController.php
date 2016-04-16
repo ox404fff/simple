@@ -8,8 +8,22 @@ namespace vendor;
  * Class BaseController
  * @package vendor
  */
-class BaseController
+abstract class BaseController extends BaseComponent
 {
+
+    /**
+     * @var string
+     */
+    public $action;
+
+
+    /**
+     * Initialise and run controller
+     */
+    public function init()
+    {
+
+    }
 
 
     /**
