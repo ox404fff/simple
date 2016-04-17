@@ -91,6 +91,10 @@ class View extends BaseComponent
 
     /**
      * Render partial
+     *
+     * @param $view
+     * @param $data
+     * @throws \Exception
      */
     public function render($view, $data)
     {
@@ -108,11 +112,24 @@ class View extends BaseComponent
 
 
     /**
+     * Get current view directory path
+     *
      * @return string
      */
     public function getViewDirectory()
     {
         return dirname($this->templatePath);
+    }
+
+
+    /**
+     * Getting assert manager component
+     *
+     * @return components\AssetsManager
+     */
+    public function getAssertManager()
+    {
+        return Application::getInstance()->assetsManager;
     }
 
 

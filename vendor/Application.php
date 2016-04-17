@@ -2,6 +2,7 @@
 
 namespace vendor;
 
+use vendor\components\AssetsManager;
 use vendor\components\DBConnection;
 use vendor\components\UrlManager;
 
@@ -10,6 +11,8 @@ use vendor\components\UrlManager;
  *
  * @property UrlManager $urlManager
  * @property DBConnection $db
+ * @property AssetsManager $assetsManager
+ *
  * @property BaseController $controller
  *
  * @package vendor
