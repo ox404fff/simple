@@ -15,6 +15,10 @@ var js_default = function(obj) {
         $_commentsContainer = $(_params.selectors.commentsContainer);
 
         $_createCommentPopup = $(_params.selectors.createCommentPopup);
+
+        $_createCommentPopup.on('hide.bs.modal', function (event) {
+            _hideErrors($_createCommentPopup);
+        });
     };
 
 
@@ -27,8 +31,7 @@ var js_default = function(obj) {
         $_parentCommentInput.val(parentId);
         $_currentCommentInput.val(0);
 
-        $createCommentForm.attr({action:_params.urls.createComment});
-        $createCommentForm.find("input:first").focus();
+        $createCommentForm.attr({action:_params.urls.create});
     };
 
 
@@ -52,10 +55,19 @@ var js_default = function(obj) {
 
                 if (response.data.created) {
 
+                    if (_params.isRemoveEmptyAfterCreated) {
+                        $(_params.selectors.empty).remove();
+                        _params.isRemoveEmptyAfterCreated = 0;
+                    }
+
+                    if (_params.isShowCreateBtnAfterCreated) {
+                        $(_params.selectors.create).fadeIn(500);
+                        _params.isShowCreateBtnAfterCreated = 0;
+                    }
+
                     $_createCommentPopup.modal("hide");
                     $_commentsContainer.prepend(response.data.html.comment);
                     js_main.success(response.data.message);
-
                 }
             } else {
                 js_main.error(response.error);
@@ -68,9 +80,35 @@ var js_default = function(obj) {
     };
 
 
-    obj.loadMore = function(fromId) {
+    obj.loadMore = function(el, fromId) {
+        var $el = $(el);
+
+        $el.attr("disabled", "disabled");
+
+        var backupLabel = $el.html();
+        $el.html(_params.text.loading);
+
+        $.ajax({
+            url: _params.urls.more,
+            method: "GET",
+            data: {"from-id": fromId},
+            dataType: "json"
+        }).done(function(response) {
+
+            $el.html(backupLabel);
+            $el.removeAttr("disabled");
+
+            $(_params.selectors.moreCommentsReplace).replaceWith(response.data.html);
+
+        }).fail(function() {
+            alert( "Something wrong, try to reload the page" );
+        });
+    };
 
 
+    var _hideErrors = function($el) {
+        $el.find("p.error").remove();
+        $el.find(".error").removeClass("error");
     };
 
     return obj;

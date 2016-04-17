@@ -17,14 +17,14 @@
                 <h4 class="modal-title" id="new-comment">New comment</h4>
             </div>
             <div class="modal-body horizontal-form">
-                <form action="<?php echo $action ?>">
+                <form action="<?php echo $action ?>" onsubmit="js_default.saveComment(); return false;">
                     <div class="form-group<?php echo empty($errors['comment-title']) ? '' : ' error' ?>">
                         <label for="comment-title" class="control-label">Title:</label>
                         <input type="text" value="<?php
                             echo isset($values['comment-title']) ? $values['comment-title'] : ''
                         ?>" name="comment-title" class="form-control" id="comment-title">
                         <?php if (!empty($errors['comment-title'])): ?>
-                            <p class="text-danger"><?php echo $errors['comment-title'] ?></p>
+                            <p class="error text-danger"><?php echo $errors['comment-title'] ?></p>
                         <?php endif ?>
                     </div>
                     <div class="form-group<?php echo empty($errors['comment-text']) ? '' : ' error' ?>">
@@ -33,7 +33,7 @@
                             echo isset($values['comment-text']) ? $values['comment-text'] : ''
                         ?></textarea>
                         <?php if (!empty($errors['comment-text'])): ?>
-                            <p class="text-danger"><?php echo $errors['comment-text'] ?></p>
+                            <p class="error text-danger"><?php echo $errors['comment-text'] ?></p>
                         <?php endif ?>
                     </div>
                     <input type="hidden" class="form-control" name="parent-comment-id" id="<?php echo $parentCommentInput ?>">

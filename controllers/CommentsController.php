@@ -5,17 +5,15 @@ namespace controllers;
 use models\Comments;
 use vendor\BaseController;
 
-class DefaultController extends BaseController
+class CommentsController extends BaseController
 {
-
     /**
-     * @var array
+     * Limit comments in page
+     *
+     * @var int
      */
-    public $createCommentElementIds = [
-        'createCommentPopup'  => 'js-create-comment-popup',
-        'parentCommentInput'  => 'js-parent-comment-input',
-        'currentCommentInput' => 'js-current-comment-input',
-    ];
+    protected $_limit = 20;
+
 
     /**
      * @var array create comment errors
@@ -25,27 +23,37 @@ class DefaultController extends BaseController
 
     public function actionIndex()
     {
-
-        $limit = 50;
-
-        $commentsList = Comments::getRootLevelComments(null, $limit);
+        $commentsList = Comments::getRootLevelComments(null, $this->_limit);
 
         return $this->render('index', [
             'commentsList'            => array_values($commentsList),
             'count'                   => count($commentsList),
-            'limit'                   => $limit,
+            'limit'                   => $this->_limit,
             'isShowEmptyBlock'        => true,
             'createCommentElementIds' => $this->createCommentElementIds,
         ]);
     }
 
 
-    public function actionShowMoreComments()
+    public function actionMore()
     {
+        $fromId = (int) $this->get('from-id');
 
+        $commentsList = Comments::getRootLevelComments($fromId, $this->_limit);
+
+        $listHtml = $this->getContent('list', [
+            'commentsList' => $commentsList,
+            'limit'        => $this->_limit,
+            'count'        => count($commentsList),
+        ]);
+
+        return $this->ajaxSuccess([
+            'html' => $listHtml
+        ]);
     }
 
-    public function actionCreateComment()
+
+    public function actionCreate()
     {
 
         $parentId = (int) $this->post('parent-comment-id');
@@ -62,16 +70,16 @@ class DefaultController extends BaseController
             $isValid = $this->validate($data);
             if ($isValid) {
                 $newComment = Comments::appendNewComment($parentId, $title, $message);
-                $htmlComment = $this->getContent(empty($parentId) ? 'commentItemRoot' : 'commentItem', [
+                $htmlComment = $this->getContent(empty($parentId) ? 'itemRoot' : 'item', [
                     'comment' => $newComment,
                     'style' => 'panel-info'
                 ]);
                 $data = [];
             }
 
-            $htmlForm = $this->getContent('createComment', array_merge(
+            $htmlForm = $this->getContent('create', array_merge(
                 $this->createCommentElementIds, [
-                    'action' => '/default/createComment',
+                    'action' => '/comments/create',
                     'errors' => $this->getErrors(),
                     'values' => $data
                 ]
@@ -90,6 +98,12 @@ class DefaultController extends BaseController
             return $this->ajaxError($e->getMessage());
         }
 
+    }
+
+
+    public function actionUpdate()
+    {
+        return $this->ajaxSuccess();
     }
 
 
@@ -138,9 +152,16 @@ class DefaultController extends BaseController
     }
 
 
-    public function actionUpdateComment()
-    {
-        return $this->ajaxSuccess();
-    }
+    /**
+     * Config with creation form input selectors
+     *
+     * @var array
+     */
+    public $createCommentElementIds = [
+        'createCommentPopup'  => 'js-create-comment-popup',
+        'parentCommentInput'  => 'js-parent-comment-input',
+        'currentCommentInput' => 'js-current-comment-input',
+    ];
+
 
 } 

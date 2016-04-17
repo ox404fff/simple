@@ -16,28 +16,28 @@
             <h1 class="m-0">Simple comments tree</h1>
         </div>
         <div class="col-xs-12 col-md-3">
-            <div class="btn btn-success btn-lg full-w" onclick="js_default.createComment()">Write comment</div>
+            <div class="btn btn-success btn-lg full-w" onclick="js_default.createComment()" id="js-create"<?php
+                echo $count == 0 ? ' style="display:none"' : ''
+            ?>>Write comment</div>
         </div>
     </div>
 </div>
+<div id="js-comments-container">
 <?php if ($isShowEmptyBlock && empty($commentsList)): ?>
-    <div class="well well-lg text-center">
-        <div class="btn btn-primary btn-lg" onclick="js_default.createComment()">Write comment</div>
-    </div>
+<div class="well well-lg text-center" id="js-empty">
+    <div class="btn btn-primary btn-lg" onclick="js_default.createComment()">Write comment</div>
+</div>
 <?php else: ?>
-    <div id="comments-container">
-
-        <?php $this->render('commentsList', [
-            'commentsList' => $commentsList,
-            'limit'        => $limit,
-            'count'        => $count,
-        ]) ?>
-
-    </div>
+<?php $this->render('list', [
+    'commentsList' => $commentsList,
+    'limit'        => $limit,
+    'count'        => $count,
+]) ?>
 <?php endif;?>
+</div>
 
-<?php $this->render('createComment', array_merge($createCommentElementIds, [
-    'action' => '/default/createComment',
+<?php $this->render('create', array_merge($createCommentElementIds, [
+    'action' => '/comments/create',
     'errors' => [],
     'values' => [],
 ])) ?>
@@ -48,11 +48,20 @@
             createCommentPopup: "#<?php echo $createCommentElementIds['createCommentPopup'] ?>",
             parentCommentInput: "#<?php echo $createCommentElementIds['parentCommentInput'] ?>",
             currentCommentInput: "#<?php echo $createCommentElementIds['currentCommentInput'] ?>",
-            commentsContainer: "#comments-container"
+            commentsContainer: "#js-comments-container",
+            moreCommentsReplace: "#js-more-comments-replace",
+            empty: "#js-empty",
+            create: "#js-create"
         },
         urls: {
-            createComment: "/default/createComment",
-            updateComment: "/default/updateComment",
-        }
+            create: "/comments/create/",
+            update: "/comments/update/",
+            more: "/comments/more/"
+        },
+        text: {
+            loading: "Loading..."
+        },
+        isRemoveEmptyAfterCreated: <?php echo (int) ($count == 0) ?>,
+        isShowCreateBtnAfterCreated: <?php echo (int) ($count == 0) ?>
     });
 <?php \vendor\Application::getInstance()->assetsManager->endJs() ?>
