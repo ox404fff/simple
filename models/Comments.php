@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: ox404fff
- * Date: 14.04.16
- * Time: 21:20
- */
 
 namespace models;
 
@@ -19,16 +13,40 @@ use vendor\BaseModel;
 class Comments extends BaseModel
 {
 
+    /**
+     * Root comment id
+     */
+    const ID_ROOT = 0;
+
+    /**
+     * Table with comments
+     *
+     * @var string
+     */
     protected static $tableName = 'comments';
 
 
     /**
      * Find all comments
+     *
+     * @return array
      */
     public static function findAll()
     {
-        return [];
+        return self::queryAll('SELECT * FROM `'.self::$tableName.'` as t WHERE t.id > :id', [':id' => 5]);
     }
+
+
+    /**
+     * Find one comments
+     *
+     * @return array
+     */
+    public static function find()
+    {
+        return self::query('SELECT * FROM `'.self::$tableName.'` as t WHERE t.id = :id', [':id' => 6]);
+    }
+
 
 
     /**
@@ -42,10 +60,11 @@ class Comments extends BaseModel
     public static function createNewComment($parentId, $commentText, $prepend = false)
     {
 
-        self::insert([
-            'message' => 'test',
+        return self::insert([
+            'message'    => $commentText,
+            'created_at' => time(),
+            'updated_at' => time()
         ]);
-
 
     }
 

@@ -18,15 +18,17 @@ abstract class BaseModel extends BaseComponent
      */
     protected static $tableName;
 
+
     /**
      * Select record from database
      *
      * @param $query
      * @param array $bind
+     * @return array
      */
     public static function query($query, $bind = [])
     {
-        self::getConnection()->query($query, $bind);
+        return self::getConnection()->query($query, $bind);
     }
 
 
@@ -35,10 +37,11 @@ abstract class BaseModel extends BaseComponent
      *
      * @param $query
      * @param array $bind
+     * @return array
      */
     public static function queryAll($query, $bind = [])
     {
-        self::getConnection()->queryAll($query, $bind);
+        return self::getConnection()->queryAll($query, $bind);
     }
 
 
@@ -63,16 +66,12 @@ abstract class BaseModel extends BaseComponent
      */
     public static function insert($data)
     {
-
-        $data['created_at'] = time();
-        $data['updated_at'] = time();
-
         $bind = [];
         foreach ($data as $column => $value) {
             $bind[':'.$column] = $value;
         }
 
-        return self::exec('INSERT INTO '.static::$tableName.'('.implode(', ', array_keys($data)).') VALUES('.implode(', ', array_keys($bind)).')', $bind);
+        return self::exec('INSERT INTO `'.static::$tableName.'`('.implode(', ', array_keys($data)).') VALUES('.implode(', ', array_keys($bind)).')', $bind);
     }
 
 

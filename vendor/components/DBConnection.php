@@ -44,6 +44,14 @@ class DBConnection extends BaseComponent
 
 
     /**
+     * Error reporting (Production - \PDO::ERRMODE_SILENT, Development - \PDO::ERRMODE_EXCEPTION)
+     *
+     * @var int
+     */
+    public $errorMode = \PDO::ERRMODE_SILENT;
+
+
+    /**
      * Connect to database
      *
      * @throws \PDOException
@@ -55,9 +63,7 @@ class DBConnection extends BaseComponent
             $this->username, $this->password
         );
 
-        if (ENVIRONMENT == 'dev') {
-            $this->_handler->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
-        }
+        $this->_handler->setAttribute(\PDO::ATTR_ERRMODE, $this->errorMode);
     }
 
 
@@ -71,25 +77,36 @@ class DBConnection extends BaseComponent
     public function exec($query, $bind = [])
     {
         $query = $this->_handler->prepare($query);
-
         return $query->execute($bind);
     }
 
 
     /**
      * Select one record
+     *
+     * @param $query
+     * @param array $bind
+     * @return mixed
      */
     public function query($query, $bind = [])
     {
-
+        $query = $this->_handler->prepare($query, [\PDO::ATTR_CURSOR => \PDO::CURSOR_FWDONLY]);
+        $query->execute($bind);
+        return $query->fetch();
     }
 
 
     /**
      * Select collection records
+     *
+     * @param $query
+     * @param array $bind
+     * @return array
      */
     public function queryAll($query, $bind = [])
     {
-
+        $query = $this->_handler->prepare($query, [\PDO::ATTR_CURSOR => \PDO::CURSOR_FWDONLY]);
+        $query->execute($bind);
+        return $query->fetchAll();
     }
 } 

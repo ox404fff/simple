@@ -16,6 +16,7 @@ return [
             'username'  => 'root',
             'password'  => 'polkilo',
             'charset'   => 'utf8',
+            'errorMode' => ENVIRONMENT == 'prod' ? \PDO::ERRMODE_SILENT : \PDO::ERRMODE_EXCEPTION
         ],
         'urlManager' => [
             'class'     => 'vendor\components\UrlManager',
