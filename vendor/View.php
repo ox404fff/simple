@@ -71,6 +71,24 @@ class View extends BaseComponent
 
 
     /**
+     * Get value in view model
+     *
+     * @param $var
+     * @param bool $raw
+     *
+     * @return mixed
+     */
+    public function getVar($var, $raw = false)
+    {
+        if (!isset($this->data[$var])) {
+            return null;
+        }
+
+        return $raw ? $this->data[$var] : $this->escape($this->data[$var]);
+    }
+
+
+    /**
      * Get rendered view html string
      *
      * @return string
@@ -130,6 +148,17 @@ class View extends BaseComponent
     public function getAssertManager()
     {
         return Application::getInstance()->assetsManager;
+    }
+
+
+    /**
+     * Getting component for format output
+     *
+     * @return \helpers\Formatter
+     */
+    public function getFormatter()
+    {
+       return Application::getInstance()->formatter;
     }
 
 

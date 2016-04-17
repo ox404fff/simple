@@ -10,6 +10,8 @@ class DefaultController extends BaseController
 
     public function actionIndex()
     {
+        Comments::appendNewComment(Comments::ID_ROOT, 'test', 'message');
+
         $commentsList = Comments::getRootLevelComments();
 
         return $this->render('commentsList', [

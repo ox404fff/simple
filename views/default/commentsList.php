@@ -7,7 +7,7 @@
 \vendor\Application::getInstance()->assetsManager->addJsFile('<script src="/js/default.js"></script>');
 ?>
 <?php foreach ($commentsList as $comment) : ?>
-    <?php $this->render('commentsItem', [
+    <?php $this->render('commentsItemRoot', [
         'comment' => $comment
     ]) ?>
 <?php endforeach ?>

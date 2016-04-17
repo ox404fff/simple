@@ -2,6 +2,7 @@
 
 namespace vendor;
 
+use helpers\Formatter;
 use vendor\components\AssetsManager;
 use vendor\components\DBConnection;
 use vendor\components\UrlManager;
@@ -12,6 +13,7 @@ use vendor\components\UrlManager;
  * @property UrlManager $urlManager
  * @property DBConnection $db
  * @property AssetsManager $assetsManager
+ * @property Formatter $formatter
  *
  * @property BaseController $controller
  *

@@ -22,6 +22,9 @@ return [
             'class'     => 'vendor\components\UrlManager',
             'prettyUrl' => true,
         ],
+        'formatter' => [
+            'class'     => 'helpers\Formatter',
+        ],
         'assetsManager' => [
             'class'     => 'vendor\components\AssetsManager',
             'globalJsFiles' => [

@@ -51,10 +51,11 @@ class Comments extends BaseModel
      * Append comment in comments tree
      *
      * @param $parentId
+     * @param $name - comment name|title
      * @param $commentText
      * @throws \Exception
      */
-    public static function appendNewComment($parentId, $commentText)
+    public static function appendNewComment($parentId, $name, $commentText)
     {
         $newCommentLevel = 0;
         $parentRightKey = self::ID_ROOT;
@@ -66,7 +67,7 @@ class Comments extends BaseModel
                 list($parentRightKey, $newCommentLevel) = self::_updateTreeForAppendNewComment($parentId);
             }
 
-            self::createNewComment($parentRightKey, $newCommentLevel, $commentText);
+            self::_insertNewComment($parentRightKey, $newCommentLevel, $name, $commentText);
 
             self::commit();
 
@@ -82,6 +83,8 @@ class Comments extends BaseModel
     /**
      * Finding all root level comments
      *
+     * @param null $toId
+     * @param int $limit
      * @return array
      */
     public static function getRootLevelComments($toId = null, $limit = 50)
@@ -109,15 +112,17 @@ class Comments extends BaseModel
      *
      * @param $parentRightKey
      * @param $newCommentLevel
+     * @param $name - comment name|title
      * @param $commentText
      * @return bool
      */
-    public static function createNewComment($parentRightKey, $newCommentLevel, $commentText)
+    public static function _insertNewComment($parentRightKey, $newCommentLevel, $name, $commentText)
     {
         return self::insert([
             'id_right'   => $parentRightKey + 1,
             'id_left'    => $parentRightKey,
             'level'      => $newCommentLevel,
+            'name'       => $name,
             'message'    => $commentText,
             'created_at' => time(),
             'updated_at' => time()

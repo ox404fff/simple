@@ -13,7 +13,12 @@
         <?php echo implode('', $this->getAssertManager()->getCssFiles()) ?>
     </head>
     <body>
-        <?php echo $content ?>
+        <div class="container">
+            <div class="page-header">
+                <h1>Simple comments tree</h1>
+            </div>
+            <?php echo $this->getVar('content', true) ?>
+        </div>
         <?php echo implode('', $this->getAssertManager()->getJsFiles()) ?>
         <?php if ($this->getAssertManager()->ifExistsJs()): ?>
         <script type="text/javascript">
