@@ -18,6 +18,7 @@ class Comments extends BaseModel
      */
     const ID_ROOT = 0;
 
+
     /**
      * Table with comments
      *
@@ -76,6 +77,31 @@ class Comments extends BaseModel
             throw $e;
         }
     }
+
+
+    /**
+     * Finding all root level comments
+     *
+     * @return array
+     */
+    public static function getRootLevelComments($toId = null, $limit = 50)
+    {
+        $wheres = ['t.level = 0', 't.is_deleted = 0'];
+        $binds = [];
+
+        if (!is_null($toId)){
+            $wheres[] = 't.id < :to_id';
+            $binds[':to_id'] = $toId;
+        }
+
+        return self::queryAll(
+            'SELECT * FROM comments as t '.
+            'WHERE '.implode(' AND ', $wheres).' '.
+            'ORDER BY t.id DESC '.
+            'LIMIT '.((int) $limit), $binds
+        );
+    }
+
 
 
     /**

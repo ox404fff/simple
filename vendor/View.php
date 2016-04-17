@@ -90,6 +90,33 @@ class View extends BaseComponent
 
 
     /**
+     * Render partial
+     */
+    public function render($view, $data)
+    {
+
+        $templatePath = implode(DIRECTORY_SEPARATOR, [$this->getViewDirectory(), $view.'.php']);
+
+        $partialView = new View();
+
+        $partialView->setTemplate($templatePath);
+
+        $partialView->setData($data);
+
+        echo $partialView->getHtml();
+    }
+
+
+    /**
+     * @return string
+     */
+    public function getViewDirectory()
+    {
+        return dirname($this->templatePath);
+    }
+
+
+    /**
      * Replace html entities
      *
      * @param $value

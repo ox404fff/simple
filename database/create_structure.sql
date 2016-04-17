@@ -8,7 +8,8 @@ CREATE TABLE comments (
   updated_at  bigint NOT NULL,
   is_deleted  tinyint NOT NULL DEFAULT 0,
   PRIMARY KEY (id),
-  INDEX select_branch (id_left, id_right, is_deleted)
+  INDEX select_branch (id_left, id_right, is_deleted),
+  INDEX select_root (level, is_deleted)
 )
   ENGINE=InnoDB
   DEFAULT CHARACTER SET=utf8 COLLATE=utf8_general_ci;

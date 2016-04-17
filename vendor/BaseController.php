@@ -132,7 +132,7 @@ abstract class BaseController extends BaseComponent
      */
     protected function getTemplatePath($viewFile)
     {
-        return BASE_PATH.'/views/'.$this->id.'/'.$viewFile.'.php';
+        return implode(DIRECTORY_SEPARATOR, [BASE_PATH, 'views', $this->id, $viewFile.'.php']);
     }
 
 
@@ -144,8 +144,7 @@ abstract class BaseController extends BaseComponent
      */
     protected function getLayoutPath($layoutFile)
     {
-        return BASE_PATH.'/views/layout/'.$layoutFile.'.php';
+        return implode(DIRECTORY_SEPARATOR, [BASE_PATH, 'views', 'layout', $layoutFile.'.php']);
     }
-
 
 } 
