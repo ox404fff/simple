@@ -114,7 +114,7 @@ class View extends BaseComponent
      * @param $data
      * @throws \Exception
      */
-    public function render($view, $data)
+    public function render($view, $data = [])
     {
 
         $templatePath = implode(DIRECTORY_SEPARATOR, [$this->getViewDirectory(), $view.'.php']);

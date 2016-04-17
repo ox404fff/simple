@@ -112,6 +112,17 @@ class DBConnection extends BaseComponent
 
 
     /**
+     * Get last autoincrement identity
+     *
+     * @return int
+     */
+    public function getLastInsertId()
+    {
+        return (int) $this->_handler->lastInsertId();
+    }
+
+
+    /**
      * Begin transaction
      */
     public function beginTransaction()

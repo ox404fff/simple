@@ -10,8 +10,8 @@
 \vendor\Application::getInstance()->assetsManager->addJsFile('<script src="/js/default.js"></script>');
 ?>
 <?php if ($isShowEmptyBlock && empty($commentsList)): ?>
-    <div class="well text-center">
-        <a class="btn btn-primary btn-lg">Write comment</a>
+    <div class="well well-lg text-center">
+        <div class="btn btn-primary btn-lg" onclick="js_default.createComment()">Write comment</div>
     </div>
 <?php endif;?>
 <?php foreach ($commentsList as $num => $comment) : ?>
@@ -21,12 +21,27 @@
         ]) ?>
     <?php else: ?>
         <div class="text-center">
-            <div class="btn btn-default btn-lg">Load more</div>
+            <div class="btn btn-default btn-lg" onclick="js_default.loadMore(<?php echo $comment['id'] ?>)">Load more</div>
         </div>
     <?php endif ?>
 <?php endforeach ?>
 
+<?php $this->render('createComment', [
+    'createCommentPopup'  => 'js-create-comment-popup',
+    'parentCommentInput'  => 'js-parent-comment-input',
+    'currentCommentInput' => 'js-current-comment-input',
+]) ?>
+
 <?php \vendor\Application::getInstance()->assetsManager->beginJs() ?>
-    js_defaut.init({
+    js_default.init({
+        selectors: {
+            createCommentPopup: "#js-create-comment-popup",
+            parentCommentInput: "#js-parent-comment-input",
+            currentCommentInput: "#js-current-comment-input"
+        },
+        urls: {
+            createComment: "/default/createComment",
+            updateComment: "/default/updateComment",
+        }
     });
 <?php \vendor\Application::getInstance()->assetsManager->endJs() ?>

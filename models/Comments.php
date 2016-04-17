@@ -53,6 +53,8 @@ class Comments extends BaseModel
      * @param $parentId
      * @param $name - comment name|title
      * @param $commentText
+     *
+     * @return array
      * @throws \Exception
      */
     public static function appendNewComment($parentId, $name, $commentText)
@@ -67,7 +69,7 @@ class Comments extends BaseModel
                 list($parentRightKey, $newCommentLevel) = self::_updateTreeForAppendNewComment($parentId);
             }
 
-            self::_insertNewComment($parentRightKey, $newCommentLevel, $name, $commentText);
+            $newComment = self::_insertNewComment($parentRightKey, $newCommentLevel, $name, $commentText);
 
             self::commit();
 
@@ -77,6 +79,8 @@ class Comments extends BaseModel
 
             throw $e;
         }
+
+        return $newComment;
     }
 
 
@@ -106,19 +110,20 @@ class Comments extends BaseModel
     }
 
 
-
     /**
-     * Create new comment record
+     * Create new comment and return his
      *
      * @param $parentRightKey
      * @param $newCommentLevel
      * @param $name - comment name|title
      * @param $commentText
-     * @return bool
+     *
+     * @throws \Exception
+     * @return array
      */
     public static function _insertNewComment($parentRightKey, $newCommentLevel, $name, $commentText)
     {
-        return self::insert([
+        $newComment = [
             'id_right'       => $parentRightKey + 1,
             'id_left'        => $parentRightKey,
             'level'          => $newCommentLevel,
@@ -126,9 +131,19 @@ class Comments extends BaseModel
             'message'        => $commentText,
             'count_children' => 0,
             'created_at'     => time(),
-            'updated_at'     => time()
-        ]);
+            'updated_at'     => time(),
+            'is_deleted'     => 0,
+        ];
 
+        $result = self::insert($newComment);
+
+        if (!$result) {
+            throw new \Exception('Comment is not created');
+        }
+
+        $newComment['id'] = self::getLastInsertId();
+
+        return $newComment;
     }
 
 

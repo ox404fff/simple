@@ -125,6 +125,41 @@ abstract class BaseController extends BaseComponent
 
 
     /**
+     * Return json success fot ajax request
+     *
+     * @param array $data
+     * @return bool
+     */
+    public function ajaxSuccess($data = [])
+    {
+        echo json_encode([
+            'status' => 1,
+            'data'   => $data,
+        ]);
+        return true;
+    }
+
+
+
+    /**
+     * Return json error fot ajax request
+     *
+     * @param string $message
+     * @param array $data
+     * @return bool
+     */
+    public function ajaxError($message, $data = [])
+    {
+        echo json_encode([
+            'status' => 0,
+            'error'  => $message,
+            'data'   => $data,
+        ]);
+        return true;
+    }
+
+
+    /**
      * Getting full path to template
      *
      * @param $viewFile

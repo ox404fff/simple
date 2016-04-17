@@ -30,11 +30,17 @@ class DefaultController extends BaseController
     }
 
 
-    public function actionCreateNewComment()
+    public function actionCreateComment()
     {
+        $newComment = Comments::appendNewComment(Comments::ID_ROOT, 'test', 'message');
 
+        return $this->ajaxSuccess();
     }
 
-    //         Comments::appendNewComment(Comments::ID_ROOT, 'test', 'message');
+
+    public function actionUpdateComment()
+    {
+        return $this->ajaxSuccess();
+    }
 
 } 

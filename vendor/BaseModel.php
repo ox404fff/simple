@@ -76,6 +76,17 @@ abstract class BaseModel extends BaseComponent
 
 
     /**
+     * Get last autoincrement identity
+     *
+     * @return int
+     */
+    public static function getLastInsertId()
+    {
+        self::getConnection()->getLastInsertId();
+    }
+
+
+    /**
      * Begin transaction
      */
     public static function beginTransaction()
