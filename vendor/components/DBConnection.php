@@ -109,4 +109,31 @@ class DBConnection extends BaseComponent
         $query->execute($bind);
         return $query->fetchAll();
     }
+
+
+    /**
+     * Begin transaction
+     */
+    public function beginTransaction()
+    {
+        $this->_handler->beginTransaction();
+    }
+
+
+    /**
+     * Apply changes in transaction
+     */
+    public function commit()
+    {
+        $this->_handler->commit();
+    }
+
+
+    /**
+     * Rollback changes in transaction
+     */
+    public function rollback()
+    {
+        $this->_handler->rollBack();
+    }
 } 

@@ -76,6 +76,33 @@ abstract class BaseModel extends BaseComponent
 
 
     /**
+     * Begin transaction
+     */
+    public static function beginTransaction()
+    {
+        self::getConnection()->beginTransaction();
+    }
+
+
+    /**
+     * Apply changes in transaction
+     */
+    public static function commit()
+    {
+        self::getConnection()->commit();
+    }
+
+
+    /**
+     * Rollback changes in transaction
+     */
+    public static function rollback()
+    {
+        self::getConnection()->rollback();
+    }
+
+
+    /**
      * Get database connection object
      *
      * @return components\DBConnection
