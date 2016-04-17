@@ -31,6 +31,21 @@ body {
     margin: 20px 0;
 }
 
+.page-header {
+    margin-top: 60px;
+}
+
+#js-alert-cont {
+    position: fixed;
+    z-index: 100;
+    top: 0;
+    left: 0;
+    width: 100%;
+}
+
+#js-alert {
+    margin: 0 auto;
+}
 
 .fl-right {
     float:right;

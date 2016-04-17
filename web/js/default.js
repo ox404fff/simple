@@ -26,6 +26,8 @@ var js_default = function(obj) {
         $_createCommentPopup.modal("show");
         $_parentCommentInput.val(parentId);
         $_currentCommentInput.val(0);
+
+        $_createCommentForm.find("input:first").focus();
     };
 
 
@@ -42,12 +44,16 @@ var js_default = function(obj) {
 
             if (response.status) {
 
-                $_createCommentPopup.modal("hide");
+                var $newForm = $(response.data.html.form).find("form");
+                $_createCommentForm.replaceWith($newForm);
 
-                js_main.success(response.data.message);
+                if (response.data.created) {
 
-                $_commentsContainer.prepend(response.data.html.comment);
+                    $_createCommentPopup.modal("hide");
+                    $_commentsContainer.prepend(response.data.html.comment);
+                    js_main.success(response.data.message);
 
+                }
             } else {
                 js_main.error(response.error);
             }

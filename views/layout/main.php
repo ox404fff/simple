@@ -14,6 +14,12 @@
     </head>
     <body>
         <div class="container">
+            <div id="js-alert-cont" style="display: none;">
+                <div id="js-alert" class="alert">
+                    <button type="button" class="close" data-dismiss="alert">&times;</button>
+                    <span class="message"></span>
+                </div>
+            </div>
             <?php echo $this->getVar('content', true) ?>
         </div>
         <footer class="footer">

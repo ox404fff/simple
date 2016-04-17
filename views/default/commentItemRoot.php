@@ -10,7 +10,6 @@
         <h3 class="panel-title"><?php echo $comment['name'] ?></h3>
     </div>
     <div class="panel-body">
-        Panel content
         <?php echo $comment['message'] ?>
     </div>
     <div class="panel-footer">
