@@ -119,13 +119,14 @@ class Comments extends BaseModel
     public static function _insertNewComment($parentRightKey, $newCommentLevel, $name, $commentText)
     {
         return self::insert([
-            'id_right'   => $parentRightKey + 1,
-            'id_left'    => $parentRightKey,
-            'level'      => $newCommentLevel,
-            'name'       => $name,
-            'message'    => $commentText,
-            'created_at' => time(),
-            'updated_at' => time()
+            'id_right'       => $parentRightKey + 1,
+            'id_left'        => $parentRightKey,
+            'level'          => $newCommentLevel,
+            'name'           => $name,
+            'message'        => $commentText,
+            'count_children' => 0,
+            'created_at'     => time(),
+            'updated_at'     => time()
         ]);
 
     }
@@ -156,7 +157,7 @@ class Comments extends BaseModel
             ]
         );
 
-        return [$parentRightKey, $newCommentLevel];
+        return [$parentRightKey, $newCommentLevel, 1];
     }
 
 }

@@ -15,10 +15,15 @@
     <body>
         <div class="container">
             <div class="page-header">
-                <h1>Simple comments tree</h1>
+                <h1 class="text-center">Simple comments tree</h1>
             </div>
             <?php echo $this->getVar('content', true) ?>
         </div>
+        <footer class="footer">
+            <div class="container">
+                <p class="text-muted">Author - Fedosenko Oleg.</p>
+            </div>
+        </footer>
         <?php echo implode('', $this->getAssertManager()->getJsFiles()) ?>
         <?php if ($this->getAssertManager()->ifExistsJs()): ?>
         <script type="text/javascript">
