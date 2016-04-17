@@ -23,8 +23,8 @@
                         <label for="comment-text" class="control-label">Text:</label>
                         <textarea class="form-control" name="comment-text" id="comment-text"></textarea>
                     </div>
-                    <input type="hidden" class="form-control" name="<?php echo $parentCommentInput ?>" id="<?php echo $parentCommentInput ?>">
-                    <input type="hidden" class="form-control" name="<?php echo $currentCommentInput ?>" id="<?php echo $currentCommentInput ?>">
+                    <input type="hidden" class="form-control" name="parent-comment-id" id="<?php echo $parentCommentInput ?>">
+                    <input type="hidden" class="form-control" name="current-comment-id" id="<?php echo $currentCommentInput ?>">
                 </form>
             </div>
             <div class="modal-footer">

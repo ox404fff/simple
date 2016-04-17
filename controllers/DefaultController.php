@@ -3,6 +3,7 @@
 namespace controllers;
 
 use models\Comments;
+use vendor\Application;
 use vendor\BaseController;
 
 class DefaultController extends BaseController
@@ -32,9 +33,31 @@ class DefaultController extends BaseController
 
     public function actionCreateComment()
     {
-        $newComment = Comments::appendNewComment(Comments::ID_ROOT, 'test', 'message');
 
-        return $this->ajaxSuccess();
+        $parentId = $this->post('parent-comment-id');
+        $title    = $this->post('comment-title');
+        $message  = $this->post('comment-text');
+
+        try {
+            $newComment = Comments::appendNewComment($parentId, $title, $message);
+
+            $html = $this->getContent(empty($parentId) ? 'commentsItemRoot' : 'commentsItem', [
+                'comment' => $newComment,
+                'style'   => 'panel-primary'
+            ]);
+
+            return $this->ajaxSuccess([
+                'html' => [
+                    'comment' => $html,
+                    'form'    => $html,
+                ],
+                'message'     => 'Comment successfully created!'
+            ]);
+
+        } catch (\Exception $e) {
+            return $this->ajaxError($e->getMessage());
+        }
+
     }
 
 

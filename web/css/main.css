@@ -47,3 +47,11 @@ body {
 .m-l_m {
     margin-left: 10px;
 }
+
+.m-0 {
+    margin: 0;
+}
+
+.full-w {
+    width: 100%;
+}

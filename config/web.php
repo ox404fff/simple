@@ -22,6 +22,9 @@ return [
             'class'     => 'vendor\components\UrlManager',
             'prettyUrl' => true,
         ],
+        'request' => [
+            'class'     => 'vendor\components\Request',
+        ],
         'formatter' => [
             'class'     => 'helpers\Formatter',
         ],

@@ -111,16 +111,31 @@ abstract class BaseController extends BaseComponent
      */
     public function render($view, $data = [])
     {
-        $templatePath = $this->getTemplatePath($view);
-        $this->contentView->setTemplate($templatePath);
-        $this->contentView->setData($data);
-        $content = $this->contentView->getHtml();
+        $content = $this->getContent($view, $data);
 
         $this->layoutView->setData([
             'content'  => $content,
             'title'    => $this->title,
         ]);
+
         echo $this->layoutView->getHtml();
+    }
+
+
+    /**
+     * Return rendered view
+     *
+     * @param $view
+     * @param array $data
+     *
+     * @return string
+     */
+    public function getContent($view, $data = [])
+    {
+        $templatePath = $this->getTemplatePath($view);
+        $this->contentView->setTemplate($templatePath);
+        $this->contentView->setData($data);
+        return $this->contentView->getHtml();
     }
 
 
@@ -156,6 +171,32 @@ abstract class BaseController extends BaseComponent
             'data'   => $data,
         ]);
         return true;
+    }
+
+
+    /**
+     * Return value from post
+     *
+     * @param $key
+     *
+     * @return mixed
+     */
+    public function post($key)
+    {
+        return Application::getInstance()->request->post($key);
+    }
+
+
+    /**
+     * Return value from get
+     *
+     * @param $key
+     *
+     * @return mixed
+     */
+    public function get($key)
+    {
+        return Application::getInstance()->request->get($key);
     }
 
 

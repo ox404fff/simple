@@ -6,12 +6,14 @@ var js_default = function(obj) {
     var $_parentCommentInput;
     var $_currentCommentInput;
     var $_createCommentForm;
+    var $_commentsContainer;
 
     obj.init = function(params) {
         _params = params || {};
 
         $_parentCommentInput = $(_params.selectors.parentCommentInput);
         $_currentCommentInput = $(_params.selectors.currentCommentInput);
+        $_commentsContainer = $(_params.selectors.commentsContainer);
 
         $_createCommentPopup = $(_params.selectors.createCommentPopup);
         $_createCommentForm = $_createCommentPopup.find("form");
@@ -29,6 +31,8 @@ var js_default = function(obj) {
 
     obj.saveComment = function() {
 
+        var parentId = $_parentCommentInput.val();
+
         $.ajax({
             url: $_createCommentForm.attr("action"),
             method: "POST",
@@ -38,8 +42,14 @@ var js_default = function(obj) {
 
             if (response.status) {
 
+                $_createCommentPopup.modal("hide");
+
+                js_main.success(response.data.message);
+
+                $_commentsContainer.prepend(response.data.html.comment);
+
             } else {
-                js_main.error(response);
+                js_main.error(response.error);
             }
 
         }).fail(function() {

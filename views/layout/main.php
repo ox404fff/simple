@@ -14,9 +14,6 @@
     </head>
     <body>
         <div class="container">
-            <div class="page-header">
-                <h1 class="text-center">Simple comments tree</h1>
-            </div>
             <?php echo $this->getVar('content', true) ?>
         </div>
         <footer class="footer">

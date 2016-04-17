@@ -1,10 +1,11 @@
 <?php
 /**
  * @var \vendor\View $this
+ * @var string $style
  * @var array $comment
  */
 ?>
-<div class="panel panel-primary">
+<div class="panel <?php echo $style ?>">
     <div class="panel-heading">
         <h3 class="panel-title"><?php echo $comment['name'] ?></h3>
     </div>
