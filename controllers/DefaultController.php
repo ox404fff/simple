@@ -17,6 +17,12 @@ class DefaultController extends BaseController
         'currentCommentInput' => 'js-current-comment-input',
     ];
 
+    /**
+     * @var array create comment errors
+     */
+    protected $errors = [];
+
+
     public function actionIndex()
     {
 
@@ -39,30 +45,44 @@ class DefaultController extends BaseController
 
     }
 
-
     public function actionCreateComment()
     {
 
-        $parentId = $this->post('parent-comment-id');
-        $title    = $this->post('comment-title');
-        $message  = $this->post('comment-text');
+        $parentId = (int) $this->post('parent-comment-id');
+        $title    = trim($this->post('comment-title'));
+        $message  = trim($this->post('comment-text'));
+
+        $data = [
+            'comment-title' => $title,
+            'comment-text'  => $message
+        ];
 
         try {
-            $newComment = Comments::appendNewComment($parentId, $title, $message);
+            $htmlComment = '';
+            $isValid = $this->validate($data);
+            if ($isValid) {
+                $newComment = Comments::appendNewComment($parentId, $title, $message);
+                $htmlComment = $this->getContent(empty($parentId) ? 'commentItemRoot' : 'commentItem', [
+                    'comment' => $newComment,
+                    'style' => 'panel-info'
+                ]);
+                $data = [];
+            }
 
-            $htmlComment = $this->getContent(empty($parentId) ? 'commentItemRoot' : 'commentItem', [
-                'comment' => $newComment,
-                'style'   => 'panel-info'
-            ]);
-
-            $htmlForm = $this->getContent('createComment', $this->createCommentElementIds);
+            $htmlForm = $this->getContent('createComment', array_merge(
+                $this->createCommentElementIds, [
+                    'action' => '/default/createComment',
+                    'errors' => $this->getErrors(),
+                    'values' => $data
+                ]
+            ));
 
             return $this->ajaxSuccess([
                 'html' => [
                     'comment' => $htmlComment,
                     'form'    => $htmlForm,
                 ],
-                'created'     => 1,
+                'created'     => (int) $isValid,
                 'message'     => 'Comment successfully created!'
             ]);
 
@@ -70,6 +90,51 @@ class DefaultController extends BaseController
             return $this->ajaxError($e->getMessage());
         }
 
+    }
+
+
+    /**
+     * @param array $data
+     * @return bool
+     */
+    protected function validate($data)
+    {
+        $this->errors = [];
+
+        foreach ($data as $key => $value) {
+            if (empty($value)) {
+                $this->errors[$key] = 'Can not be empty!';
+            }
+        }
+
+        if (mb_strlen($data['comment-title']) < 2) {
+            $this->errors['comment-title'] = 'Minimum 2 characters';
+        }
+
+        if (mb_strlen($data['comment-title']) > 200) {
+            $this->errors['comment-title'] = 'Maximum 200 characters';
+        }
+
+        if (mb_strlen($data['comment-text']) < 2) {
+            $this->errors['comment-text'] = 'Minimum 2 characters';
+        }
+
+        if (mb_strlen($data['comment-text']) > 2000) {
+            $this->errors['comment-text'] = 'Minimum 2000 characters';
+        }
+
+        return empty($this->errors);
+    }
+
+
+    /**
+     * Get errors after validate
+     *
+     * @return array
+     */
+    protected function getErrors()
+    {
+        return $this->errors;
     }
 
 

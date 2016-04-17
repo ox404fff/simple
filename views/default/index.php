@@ -35,7 +35,12 @@
 
     </div>
 <?php endif;?>
-<?php $this->render('createComment', $createCommentElementIds) ?>
+
+<?php $this->render('createComment', array_merge($createCommentElementIds, [
+    'action' => '/default/createComment',
+    'errors' => [],
+    'values' => [],
+])) ?>
 
 <?php \vendor\Application::getInstance()->assetsManager->beginJs() ?>
     js_default.init({

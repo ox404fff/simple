@@ -5,7 +5,6 @@ var js_default = function(obj) {
     var $_createCommentPopup;
     var $_parentCommentInput;
     var $_currentCommentInput;
-    var $_createCommentForm;
     var $_commentsContainer;
 
     obj.init = function(params) {
@@ -16,36 +15,40 @@ var js_default = function(obj) {
         $_commentsContainer = $(_params.selectors.commentsContainer);
 
         $_createCommentPopup = $(_params.selectors.createCommentPopup);
-        $_createCommentForm = $_createCommentPopup.find("form");
     };
 
+
     obj.createComment = function(parentId) {
+        var $createCommentForm = $_createCommentPopup.find("form");
+
         parentId = parentId || 0;
 
-        $_createCommentForm.attr({action:_params.urls.createComment});
         $_createCommentPopup.modal("show");
         $_parentCommentInput.val(parentId);
         $_currentCommentInput.val(0);
 
-        $_createCommentForm.find("input:first").focus();
+        $createCommentForm.attr({action:_params.urls.createComment});
+        $createCommentForm.find("input:first").focus();
     };
 
 
     obj.saveComment = function() {
+        var $createCommentForm = $_createCommentPopup.find("form");
 
         var parentId = $_parentCommentInput.val();
+        var action = $createCommentForm.attr("action");
 
         $.ajax({
-            url: $_createCommentForm.attr("action"),
+            url: action,
             method: "POST",
-            data: $_createCommentForm.serializeArray(),
+            data: $createCommentForm.serializeArray(),
             dataType: "json"
         }).done(function(response) {
 
             if (response.status) {
 
                 var $newForm = $(response.data.html.form).find("form");
-                $_createCommentForm.replaceWith($newForm);
+                $createCommentForm.replaceWith($newForm);
 
                 if (response.data.created) {
 
