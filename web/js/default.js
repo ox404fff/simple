@@ -1,4 +1,4 @@
-var js_main = function(obj) {
+var js_defaut = function(obj) {
 
     var _params = {};
 

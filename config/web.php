@@ -21,6 +21,9 @@ return [
         'urlManager' => [
             'class'     => 'vendor\components\UrlManager',
             'prettyUrl' => true,
+        ],
+        'assetsManager' => [
+            'class'     => 'vendor\components\AssetsManager',
         ]
     ]
 ];
