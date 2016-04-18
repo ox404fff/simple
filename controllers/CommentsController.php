@@ -55,25 +55,26 @@ class CommentsController extends BaseController
 
     public function actionChilds()
     {
-        $rootId = (int) $this->get('root-id');
+        $parentId = (int) $this->get('parent-id');
 
-        $commentsList = Comments::getChildComments($rootId);
+        $root = Comments::getRoot($parentId);
+        $countNodesInRoot = Comments::getCountChildComments($root['id_left'], $root['id_right']);
+        $commentsList = Comments::getChildComments($parentId, true);
 
-        $listHtml = $this->getContent('list', [
+        $listHtml = $this->getContent('listTree', [
             'commentsList' => $commentsList,
-            'limit'        => $this->_limit,
-            'count'        => count($commentsList),
         ]);
 
         return $this->ajaxSuccess([
-            'html' => $listHtml
+            'html'             => $listHtml,
+            'rootId'           => $root['id'],
+            'countNodesInRoot' => $countNodesInRoot,
         ]);
     }
 
 
     public function actionCreate()
     {
-
         $parentId = (int) $this->post('parent-comment-id');
         $title    = trim($this->post('comment-title'));
         $message  = trim($this->post('comment-text'));
@@ -85,11 +86,13 @@ class CommentsController extends BaseController
 
         try {
             $htmlComment = '';
+            $createdId = null;
+
             $isValid = $this->validate($data);
             if ($isValid) {
                 $newComment = Comments::appendNewComment($parentId, $title, $message);
-
-                $htmlComment = $this->getContent(empty($parentId) ? 'itemRoot' : 'item', [
+                $createdId = $newComment['id'];
+                $htmlComment = $this->getContent(empty($parentId) ? 'itemRoot' : 'itemTree', [
                     'comment' => $newComment,
                     'style' => 'panel-info'
                 ]);
@@ -109,6 +112,7 @@ class CommentsController extends BaseController
                     'comment' => $htmlComment,
                     'form'    => $htmlForm,
                 ],
+                'createdId'   => $createdId,
                 'created'     => (int) $isValid,
                 'message'     => 'Comment successfully created!'
             ]);
@@ -116,7 +120,6 @@ class CommentsController extends BaseController
         } catch (\Exception $e) {
             return $this->ajaxError($e->getMessage());
         }
-
     }
 
 

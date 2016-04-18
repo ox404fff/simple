@@ -36,8 +36,8 @@
                             <p class="error text-danger"><?php echo $errors['comment-text'] ?></p>
                         <?php endif ?>
                     </div>
-                    <input type="text" class="form-control" name="parent-comment-id" id="<?php echo $parentCommentInput ?>">
-                    <input type="text" class="form-control" name="current-comment-id" id="<?php echo $currentCommentInput ?>">
+                    <input type="hidden" class="form-control" name="parent-comment-id" id="<?php echo $parentCommentInput ?>">
+                    <input type="hidden" class="form-control" name="current-comment-id" id="<?php echo $currentCommentInput ?>">
                 </form>
             </div>
             <div class="modal-footer">

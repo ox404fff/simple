@@ -147,13 +147,11 @@ abstract class BaseController extends BaseComponent
      */
     public function ajaxSuccess($data = [])
     {
-        echo json_encode([
+        return $this->_renderJson([
             'status' => 1,
             'data'   => $data,
         ]);
-        return true;
     }
-
 
 
     /**
@@ -165,11 +163,24 @@ abstract class BaseController extends BaseComponent
      */
     public function ajaxError($message, $data = [])
     {
-        echo json_encode([
+        return $this->_renderJson([
             'status' => 0,
             'error'  => $message,
             'data'   => $data,
         ]);
+    }
+
+
+    /**
+     * Render json content
+     *
+     * @param $data
+     * @return bool
+     */
+    private function _renderJson($data)
+    {
+        header('content-type:application/json');
+        echo json_encode($data);
         return true;
     }
 

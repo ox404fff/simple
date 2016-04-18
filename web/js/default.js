@@ -66,8 +66,13 @@ var js_default = function(obj) {
                         _params.isShowCreateBtnAfterCreated = 0;
                     }
 
+                    if (parentId != 0) {
+                        obj.showChilds(null, parentId, response.data.createdId);
+                    } else {
+                        $_commentsContainer.prepend(response.data.html.comment);
+                    }
+
                     $_createCommentPopup.modal("hide");
-                    $_commentsContainer.prepend(response.data.html.comment);
                     js_main.success(response.data.message);
                 }
             } else {
@@ -103,24 +108,31 @@ var js_default = function(obj) {
     };
 
 
-    obj.showChilds = function(el, rootId) {
+    obj.showChilds = function(el, parentId, newNodeId) {
 
         var $el = $(el);
+
+        newNodeId = newNodeId || 0;
 
         _startLoading($el);
 
         $.ajax({
             url: _params.urls.childs,
             method: "GET",
-            data: {"root-id": rootId},
+            data: {"parent-id": parentId, "new-node-id": newNodeId},
             dataType: "json"
         }).done(function(response) {
 
             _endLoading($el);
 
             if (response.status) {
-                var $childContainer = $("#js-comment-" + rootId.toString() + " .js-child-comments");
+                var $childContainer = $("#js-comment-" + parentId.toString() + " .js-child-comments");
                 $childContainer.html(response.data.html);
+
+                var $rootCountContainer = $("#js-count-" + response.data.rootId.toString());
+                $rootCountContainer.show();
+                $rootCountContainer.html(_params.text.refresh + " (" + response.data.countNodesInRoot.toString() + ")");
+
                 $childContainer.slideDown(100);
             }
 
@@ -133,15 +145,19 @@ var js_default = function(obj) {
     var _backupLabel;
 
     var _startLoading = function($el) {
-        _backupLabel = $el.html();
-        $el.attr("disabled", "disabled");
-        $el.html(_params.text.loading);
+        if ($el != null) {
+            _backupLabel = $el.html();
+            $el.attr("disabled", "disabled");
+            $el.html(_params.text.loading);
+        }
     };
 
 
     var _endLoading = function($el) {
-        $el.html(_backupLabel);
-        $el.removeAttr("disabled");
+        if ($el != null) {
+            $el.html(_backupLabel);
+            $el.removeAttr("disabled");
+        }
     };
 
 

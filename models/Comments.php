@@ -81,7 +81,7 @@ class Comments extends BaseModel
      * @return array
      * @throws \Exception
      */
-    public static function getChildComments($parentId)
+    public static function getChildComments($parentId, $tree = false)
     {
         $parent = self::findById($parentId);
 
@@ -95,14 +95,72 @@ class Comments extends BaseModel
             ':id_left' => $parent['id_left'],
         ];
 
-        return self::queryAll(
-            sprintf('SELECT * '.
-                'FROM %s as t '.
-                'WHERE '.implode(' AND ', $wheres).' '.
-                'ORDER BY t.id_left ASC', self::$tableName
+        $result =  self::queryAll(
+            sprintf('SELECT * '.'FROM `%s` as t WHERE '.implode(' AND ', $wheres).' ORDER BY t.id_left ASC',
+                self::$tableName
             ), $binds
         );
+
+        return $tree ? self::_createTreeFromArrayByLevels($result) : $result;
+
     }
+
+
+    /**
+     * Getting count comments in subtree
+     *
+     * @param $idLeft
+     * @param $idRight
+     *
+     * @return integer
+     */
+    public static function getCountChildComments($idLeft, $idRight)
+    {
+        $wheres = ['t.id_left > :id_left', 't.id_right < :id_right', 't.is_deleted = 0'];
+        $binds = [
+            ':id_right' => $idRight,
+            ':id_left'  => $idLeft,
+        ];
+
+        return self::query(
+            sprintf('SELECT COUNT(*) as count '.'FROM `%s` as t WHERE '.implode(' AND ', $wheres),
+                self::$tableName
+            ), $binds
+        )['count'];
+
+    }
+
+
+    /**
+     * Find root node, by any node id
+     *
+     * @param $nodeId
+     * @return array
+     * @throws \Exception
+     */
+    public static function getRoot($nodeId)
+    {
+
+        $node = self::findById($nodeId);
+
+        if (empty($node)) {
+            throw new \Exception('Parent node is not found');
+        }
+
+        if ($node['level'] == 0) {
+            return $node;
+        }
+
+        return self::query(
+            sprintf('SELECT * '.'FROM `%s` as t WHERE t.id_left <= :id_left AND t.id_right >= :id_right AND level = 0 AND is_deleted = 0 LIMIT 1',
+                self::$tableName
+            ), [
+                ':id_left'  => $node['id_left'],
+                ':id_right' => $node['id_right'],
+            ]
+        );
+    }
+
 
 
     /**
@@ -232,6 +290,37 @@ class Comments extends BaseModel
         $newComment['id'] = self::getLastInsertId();
 
         return $newComment;
+    }
+
+
+    /**
+     * Create nested array from db result
+     *
+     * @param $list
+     * @param null $level
+     * @return array
+     */
+    private static function _createTreeFromArrayByLevels(&$list, &$index = 0, $level = null)
+    {
+        $result = [];
+        if (is_null($level)) {
+            $level = current($list)['level'];
+        }
+        while($node = current($list)) {
+            if ($node['level'] == $level) {
+                $result[$index] = $node;
+                $index ++;
+            } elseif ($node['level'] > $level) {
+                $result[$index - 1]['items'] = self::_createTreeFromArrayByLevels($list, $index, $node['level']);;
+            } else {
+                prev($list);
+                break;
+            }
+            next($list);
+        }
+
+
+        return $result;
     }
 
 

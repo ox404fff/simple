@@ -10,6 +10,7 @@ CREATE TABLE comments (
   updated_at  bigint NOT NULL,
   is_deleted  tinyint NOT NULL DEFAULT 0,
   PRIMARY KEY (id),
+  INDEX select_root_by_node (id_left, id_right, level, is_deleted),
   INDEX select_branch (id_left, id_right, is_deleted),
   INDEX select_root (level, is_deleted)
 )

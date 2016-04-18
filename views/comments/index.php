@@ -60,7 +60,8 @@
             more: "/comments/more/"
         },
         text: {
-            loading: "Loading..."
+            loading: "Loading...",
+            refresh: "Refresh"
         },
         isRemoveEmptyAfterCreated: <?php echo (int) ($count == 0) ?>,
         isShowCreateBtnAfterCreated: <?php echo (int) ($count == 0) ?>
