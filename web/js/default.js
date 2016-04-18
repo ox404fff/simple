@@ -3,17 +3,12 @@ var js_default = function(obj) {
     var _params = {};
 
     var $_createCommentPopup;
-    var $_parentCommentInput;
-    var $_currentCommentInput;
     var $_commentsContainer;
 
     obj.init = function(params) {
         _params = params || {};
 
-        $_parentCommentInput = $(_params.selectors.parentCommentInput);
-        $_currentCommentInput = $(_params.selectors.currentCommentInput);
         $_commentsContainer = $(_params.selectors.commentsContainer);
-
         $_createCommentPopup = $(_params.selectors.createCommentPopup);
 
         $_createCommentPopup.on('hide.bs.modal', function (event) {
@@ -22,14 +17,19 @@ var js_default = function(obj) {
     };
 
 
-    obj.createComment = function(parentId) {
+    obj.createComment = function(el, parentId) {
         var $createCommentForm = $_createCommentPopup.find("form");
+        var $createCommentPopup = $(_params.selectors.createCommentPopup);
+        var $parentCommentInput = $(_params.selectors.parentCommentInput);
+        var $currentCommentInput = $(_params.selectors.currentCommentInput);
+
 
         parentId = parentId || 0;
 
-        $_createCommentPopup.modal("show");
-        $_parentCommentInput.val(parentId);
-        $_currentCommentInput.val(0);
+
+        $createCommentPopup.modal("show");
+        $parentCommentInput.val(parentId);
+        $currentCommentInput.val(0);
 
         $createCommentForm.attr({action:_params.urls.create});
     };
@@ -37,8 +37,9 @@ var js_default = function(obj) {
 
     obj.saveComment = function() {
         var $createCommentForm = $_createCommentPopup.find("form");
+        var $parentCommentInput = $(_params.selectors.parentCommentInput);
 
-        var parentId = $_parentCommentInput.val();
+        var parentId = $parentCommentInput.val();
         var action = $createCommentForm.attr("action");
 
         $.ajax({
@@ -83,10 +84,7 @@ var js_default = function(obj) {
     obj.loadMore = function(el, fromId) {
         var $el = $(el);
 
-        $el.attr("disabled", "disabled");
-
-        var backupLabel = $el.html();
-        $el.html(_params.text.loading);
+        _startLoading($el);
 
         $.ajax({
             url: _params.urls.more,
@@ -95,14 +93,55 @@ var js_default = function(obj) {
             dataType: "json"
         }).done(function(response) {
 
-            $el.html(backupLabel);
-            $el.removeAttr("disabled");
+            _endLoading($el);
 
             $(_params.selectors.moreCommentsReplace).replaceWith(response.data.html);
 
         }).fail(function() {
             alert( "Something wrong, try to reload the page" );
         });
+    };
+
+
+    obj.showChilds = function(el, rootId) {
+
+        var $el = $(el);
+
+        _startLoading($el);
+
+        $.ajax({
+            url: _params.urls.childs,
+            method: "GET",
+            data: {"root-id": rootId},
+            dataType: "json"
+        }).done(function(response) {
+
+            _endLoading($el);
+
+            if (response.status) {
+                var $childContainer = $("#js-comment-" + rootId.toString() + " .js-child-comments");
+                $childContainer.html(response.data.html);
+                $childContainer.slideDown(100);
+            }
+
+        }).fail(function() {
+            alert( "Something wrong, try to reload the page" );
+        });
+
+    };
+
+    var _backupLabel;
+
+    var _startLoading = function($el) {
+        _backupLabel = $el.html();
+        $el.attr("disabled", "disabled");
+        $el.html(_params.text.loading);
+    };
+
+
+    var _endLoading = function($el) {
+        $el.html(_backupLabel);
+        $el.removeAttr("disabled");
     };
 
 

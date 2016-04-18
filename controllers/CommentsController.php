@@ -41,6 +41,24 @@ class CommentsController extends BaseController
 
         $commentsList = Comments::getRootLevelComments($fromId, $this->_limit);
 
+        $listHtml = $this->getContent('listRoot', [
+            'commentsList' => $commentsList,
+            'limit'        => $this->_limit,
+            'count'        => count($commentsList),
+        ]);
+
+        return $this->ajaxSuccess([
+            'html' => $listHtml
+        ]);
+    }
+
+
+    public function actionChilds()
+    {
+        $rootId = (int) $this->get('root-id');
+
+        $commentsList = Comments::getChildComments($rootId);
+
         $listHtml = $this->getContent('list', [
             'commentsList' => $commentsList,
             'limit'        => $this->_limit,
@@ -70,6 +88,7 @@ class CommentsController extends BaseController
             $isValid = $this->validate($data);
             if ($isValid) {
                 $newComment = Comments::appendNewComment($parentId, $title, $message);
+
                 $htmlComment = $this->getContent(empty($parentId) ? 'itemRoot' : 'item', [
                     'comment' => $newComment,
                     'style' => 'panel-info'

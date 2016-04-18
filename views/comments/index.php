@@ -25,10 +25,10 @@
 <div id="js-comments-container">
 <?php if ($isShowEmptyBlock && empty($commentsList)): ?>
 <div class="well well-lg text-center" id="js-empty">
-    <div class="btn btn-primary btn-lg" onclick="js_default.createComment()">Write comment</div>
+    <div class="btn btn-primary btn-lg" onclick="js_default.createComment(this)">Write comment</div>
 </div>
 <?php else: ?>
-<?php $this->render('list', [
+<?php $this->render('listRoot', [
     'commentsList' => $commentsList,
     'limit'        => $limit,
     'count'        => $count,
@@ -56,6 +56,7 @@
         urls: {
             create: "/comments/create/",
             update: "/comments/update/",
+            childs: "/comments/childs/",
             more: "/comments/more/"
         },
         text: {

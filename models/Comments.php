@@ -37,50 +37,12 @@ class Comments extends BaseModel
     public static function findById($id, $lock = false)
     {
         return self::query(
-            sprintf('SELECT * FROM `%s` as t WHERE t.id = :id AND is_deleted = 0%s',
-                self::$tableName,
-                $lock ? ' FOR UPDATE' : ''
+            sprintf('SELECT * '.
+                'FROM `%s` as t WHERE t.id = :id AND is_deleted = 0%s', self::$tableName, $lock ? ' FOR UPDATE' : ''
             ), [
                 ':id' => $id
             ]
         );
-    }
-
-
-    /**
-     * Append comment in comments tree
-     *
-     * @param $parentId
-     * @param $name - comment name|title
-     * @param $commentText
-     *
-     * @return array
-     * @throws \Exception
-     */
-    public static function appendNewComment($parentId, $name, $commentText)
-    {
-        $newCommentLevel = 0;
-        $parentRightKey = self::ID_ROOT;
-
-        self::beginTransaction();
-
-        try {
-            if ($parentId != self::ID_ROOT) {
-                list($parentRightKey, $newCommentLevel) = self::_updateTreeForAppendNewComment($parentId);
-            }
-
-            $newComment = self::_insertNewComment($parentRightKey, $newCommentLevel, $name, $commentText);
-
-            self::commit();
-
-        } catch(\Exception $e) {
-
-            self::rollback();
-
-            throw $e;
-        }
-
-        return $newComment;
     }
 
 
@@ -102,11 +64,137 @@ class Comments extends BaseModel
         }
 
         return self::queryAll(
-            'SELECT * FROM comments as t '.
-            'WHERE '.implode(' AND ', $wheres).' '.
-            'ORDER BY t.id DESC '.
-            'LIMIT '.((int) $limit), $binds
+            sprintf('SELECT * '.
+                'FROM %s as t '.
+                'WHERE '.implode(' AND ', $wheres).' '.
+                'ORDER BY t.id DESC '.
+                'LIMIT %d', self::$tableName, (int) $limit
+            ), $binds
         );
+    }
+
+
+    /**
+     * Return all child nodes
+     *
+     * @param $parentId
+     * @return array
+     * @throws \Exception
+     */
+    public static function getChildComments($parentId)
+    {
+        $parent = self::findById($parentId);
+
+        if (empty($parent)) {
+            throw new \Exception('Parent node is not found');
+        }
+
+        $wheres = ['t.id_left > :id_left', 't.id_right < :id_right', 't.is_deleted = 0'];
+        $binds = [
+            ':id_right' => $parent['id_right'],
+            ':id_left' => $parent['id_left'],
+        ];
+
+        return self::queryAll(
+            sprintf('SELECT * '.
+                'FROM %s as t '.
+                'WHERE '.implode(' AND ', $wheres).' '.
+                'ORDER BY t.id_left ASC', self::$tableName
+            ), $binds
+        );
+    }
+
+
+    /**
+     * Append comment in comments tree
+     *
+     * @param $parentId
+     * @param $name - comment name|title
+     * @param $commentText
+     *
+     * @return array
+     * @throws \Exception
+     */
+    public static function appendNewComment($parentId, $name, $commentText)
+    {
+        self::beginTransaction();
+
+        try {
+            if ($parentId != self::ID_ROOT) {
+
+                $parentComment = self::findById($parentId, true);
+                if (empty($parentComment)) {
+                    throw new \Exception('Parent comment with id = '.$parentId.' is not exists');
+                }
+
+                $parentRightKey = $parentComment['id_right'];
+                $newCommentLevel = $parentComment['level'] + 1;
+
+                self::_updateBeforeNodes($parentRightKey);
+                self::_updateParentTree($parentRightKey);
+
+            } else {
+                $parentRightKey = (int) self::_getMaxRootId()['id_right'] + 1;
+                $newCommentLevel = 0;
+            }
+
+            $newComment = self::_insertNewComment($parentRightKey, $newCommentLevel, $name, $commentText);
+
+            self::commit();
+
+        } catch(\Exception $e) {
+
+            self::rollback();
+
+            throw $e;
+        }
+
+        return $newComment;
+    }
+
+
+    /**
+     * Update right and left ids for child nodes
+     *
+     * @param $parentRightKey
+     */
+    private static function _updateBeforeNodes($parentRightKey)
+    {
+        self::exec(sprintf(
+                'UPDATE `%s` as t '.
+                'SET t.id_left = t.id_left + 2, t.id_right = t.id_right + 2 '.
+                'WHERE t.id_left > :id_right', self::$tableName), [
+                ':id_right' => $parentRightKey,
+            ]
+        );
+    }
+
+
+    /**
+     * Update right id and child counts for parent tree
+     *
+     * @param $parentRightKey
+     */
+    private static function _updateParentTree($parentRightKey)
+    {
+        self::exec(sprintf(
+                'UPDATE `%s` as t '.
+                'SET t.id_right = t.id_right + 2, t.count_children = t.count_children + 1 '.
+                'WHERE t.id_right >= :id_right AND t.id_left < :id_right', self::$tableName), [
+                ':id_right' => $parentRightKey,
+            ]
+        );
+    }
+
+
+    /**
+     * Return max right id, for create root nodes
+     *
+     * @return array
+     */
+    private static function _getMaxRootId()
+    {
+        return self::query(sprintf('SELECT '.'MAX(t.id_right) as id_right from %s as t', self::$tableName));
     }
 
 
@@ -146,33 +234,5 @@ class Comments extends BaseModel
         return $newComment;
     }
 
-
-    /**
-     * Find parent node by parentId and update right and left ids children and parent nodes
-     *
-     * @param $parentId
-     * @return array
-     * @throws \Exception
-     */
-    private static function _updateTreeForAppendNewComment($parentId)
-    {
-
-        $parentComment = self::findById($parentId, true);
-        if (empty($parentComment)) {
-            throw new \Exception('Parent comment with id = '.$parentId.' is not exists');
-        }
-        $parentRightKey = (int) $parentComment['id_right'];
-        $newCommentLevel = (int) $parentComment['level'] + 1;
-
-        self::exec(
-            'UPDATE `' . self::$tableName . '` ' .
-            'SET id_right = id_right + 2, id_left = IF(id_left > :parent_right_key, id_left + 2, id_left) '.
-            'WHERE id_right >= :parent_right_key AND is_deleted = 0', [
-                ':parent_right_key' => $parentRightKey
-            ]
-        );
-
-        return [$parentRightKey, $newCommentLevel, 1];
-    }
 
 }

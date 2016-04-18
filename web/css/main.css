@@ -71,6 +71,14 @@ body {
     margin: 0;
 }
 
+.p-l_m {
+    padding-left: 10px;
+}
+
+.p-r_m {
+    padding-right: 10px;
+}
+
 .full-w {
     width: 100%;
 }

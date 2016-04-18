@@ -10,9 +10,9 @@
 <?php foreach ($commentsList as $num => $comment) : ?>
     <?php if ($num != $limit - 1): ?>
         <?php $fromId = $comment['id']; ?>
-        <?php $this->render('item', [
+        <?php $this->render('itemRoot', [
             'comment' => $comment,
-            'style'   => 'panel-default'
+            'style'   => 'panel-primary'
         ]) ?>
     <?php else: ?>
         <div class="text-center" id="js-more-comments-replace">

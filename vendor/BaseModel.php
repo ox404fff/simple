@@ -82,7 +82,7 @@ abstract class BaseModel extends BaseComponent
      */
     public static function getLastInsertId()
     {
-        self::getConnection()->getLastInsertId();
+        return self::getConnection()->getLastInsertId();
     }
 
 
