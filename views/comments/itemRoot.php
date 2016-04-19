@@ -7,7 +7,15 @@
 ?>
 <div class="panel <?php echo $style ?>" id="js-comment-<?php echo $comment['id'] ?>">
     <div class="panel-heading">
-        <h3 class="panel-title"><?php echo $comment['name'] ?></h3>
+        <h3 class="panel-title">
+            <?php echo $comment['name'] ?>
+            <button onclick="js_default.deleteComment(this, <?php echo $comment['id'] ?>)" type="button" class="btn btn-danger btn-xs fl-right m-l_m">
+                Delete
+            </button>
+            <button onclick="js_default.editComment(this, <?php echo $comment['id'] ?>)" type="button" class="btn btn-default btn-xs fl-right">
+                Edit
+            </button>
+        </h3>
     </div>
     <div class="panel-body">
         <?php echo $comment['message'] ?>

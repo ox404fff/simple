@@ -51,17 +51,23 @@
             commentsContainer: "#js-comments-container",
             moreCommentsReplace: "#js-more-comments-replace",
             empty: "#js-empty",
-            create: "#js-create"
+            create: "#js-create",
+            saveButton: "#js-save-button",
+            commentTitle: "#js-comment-title",
+            commentText: "#js-comment-text"
         },
         urls: {
             create: "/comments/create/",
             update: "/comments/update/",
             childs: "/comments/childs/",
-            more: "/comments/more/"
+            more: "/comments/more/",
+            get: "/comments/getComment/"
         },
         text: {
             loading: "Loading...",
-            refresh: "Refresh"
+            refresh: "Refresh",
+            create: "Add comment",
+            update: "Save"
         },
         isRemoveEmptyAfterCreated: <?php echo (int) ($count == 0) ?>,
         isShowCreateBtnAfterCreated: <?php echo (int) ($count == 0) ?>

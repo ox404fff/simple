@@ -22,27 +22,31 @@
                         <label for="comment-title" class="control-label">Title:</label>
                         <input type="text" value="<?php
                             echo isset($values['comment-title']) ? $values['comment-title'] : ''
-                        ?>" name="comment-title" class="form-control" id="comment-title">
+                        ?>" name="comment-title" class="form-control" id="js-comment-title">
                         <?php if (!empty($errors['comment-title'])): ?>
                             <p class="error text-danger"><?php echo $errors['comment-title'] ?></p>
                         <?php endif ?>
                     </div>
                     <div class="form-group<?php echo empty($errors['comment-text']) ? '' : ' error' ?>">
                         <label for="comment-text" class="control-label">Text:</label>
-                        <textarea class="form-control" name="comment-text" id="comment-text"><?php
+                        <textarea class="form-control" name="comment-text" id="js-comment-text"><?php
                             echo isset($values['comment-text']) ? $values['comment-text'] : ''
                         ?></textarea>
                         <?php if (!empty($errors['comment-text'])): ?>
                             <p class="error text-danger"><?php echo $errors['comment-text'] ?></p>
                         <?php endif ?>
                     </div>
-                    <input type="hidden" class="form-control" name="parent-comment-id" id="<?php echo $parentCommentInput ?>">
-                    <input type="hidden" class="form-control" name="current-comment-id" id="<?php echo $currentCommentInput ?>">
+                    <input type="hidden" class="form-control" value="<?php
+                    echo isset($values['parent-comment-id']) ? $values['parent-comment-id'] : ''
+                    ?>"  name="parent-comment-id" id="<?php echo $parentCommentInput ?>">
+                    <input type="hidden" class="form-control" value="<?php
+                    echo isset($values['current-comment-id']) ? $values['current-comment-id'] : ''
+                    ?>"  name="current-comment-id" id="<?php echo $currentCommentInput ?>">
                 </form>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary" onclick="js_default.saveComment()">Add comment</button>
+                <button onclick="js_default.saveComment()" id="js-save-button" type="button" class="btn btn-primary">Add comment</button>
             </div>
         </div>
     </div>

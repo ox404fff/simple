@@ -92,7 +92,7 @@ class DBConnection extends BaseComponent
     {
         $query = $this->_handler->prepare($query, [\PDO::ATTR_CURSOR => \PDO::CURSOR_FWDONLY]);
         $query->execute($bind);
-        return $query->fetch();
+        return $query->fetch(\PDO::FETCH_ASSOC);
     }
 
 
@@ -107,7 +107,7 @@ class DBConnection extends BaseComponent
     {
         $query = $this->_handler->prepare($query, [\PDO::ATTR_CURSOR => \PDO::CURSOR_FWDONLY]);
         $query->execute($bind);
-        return $query->fetchAll();
+        return $query->fetchAll(\PDO::FETCH_ASSOC);
     }
 
 

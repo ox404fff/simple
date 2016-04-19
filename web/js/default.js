@@ -17,15 +17,60 @@ var js_default = function(obj) {
     };
 
 
+    obj.deleteComment = function(el, id) {
+
+    };
+
+
+    obj.editComment = function(el, id) {
+
+        var $el = $(el);
+
+        _startLoading($el);
+
+        $.ajax({
+            url: _params.urls.get,
+            method: "GET",
+            data: {"id": id},
+            dataType: "json"
+        }).done(function(response) {
+
+            _endLoading($el);
+
+            var $createCommentForm = $_createCommentPopup.find("form");
+            var $createCommentPopup = $(_params.selectors.createCommentPopup);
+            var $currentCommentInput = $(_params.selectors.currentCommentInput);
+            var $parentCommentInput = $(_params.selectors.parentCommentInput);
+
+            $(_params.selectors.commentTitle).val(response.data.name);
+            $(_params.selectors.commentText).html(response.data.message);
+
+            $(_params.selectors.saveButton).html(_params.text.update);
+
+            $createCommentPopup.modal("show");
+            $currentCommentInput.val(id);
+            $parentCommentInput.val(0);
+
+            $createCommentForm.attr({action:_params.urls.create});
+
+        }).fail(function() {
+            alert( "Something wrong, try to reload the page" );
+        });
+    };
+
+
     obj.createComment = function(el, parentId) {
         var $createCommentForm = $_createCommentPopup.find("form");
         var $createCommentPopup = $(_params.selectors.createCommentPopup);
         var $parentCommentInput = $(_params.selectors.parentCommentInput);
         var $currentCommentInput = $(_params.selectors.currentCommentInput);
 
+        $(_params.selectors.commentTitle).val("");
+        $(_params.selectors.commentText).html("");
+
+        $(_params.selectors.saveButton).html(_params.text.create);
 
         parentId = parentId || 0;
-
 
         $createCommentPopup.modal("show");
         $parentCommentInput.val(parentId);

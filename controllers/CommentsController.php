@@ -81,7 +81,7 @@ class CommentsController extends BaseController
 
         $data = [
             'comment-title' => $title,
-            'comment-text'  => $message
+            'comment-text'  => $message,
         ];
 
         try {
@@ -103,7 +103,11 @@ class CommentsController extends BaseController
                 $this->createCommentElementIds, [
                     'action' => '/comments/create',
                     'errors' => $this->getErrors(),
-                    'values' => $data
+                    'values' => array_merge([
+                        'current-comment-id' => (int) trim($this->post('current-comment-id')),
+                        'parent-comment-id' => (int) trim($this->post('parent-comment-id'))],
+                        $data
+                    )
                 ]
             ));
 
@@ -126,6 +130,17 @@ class CommentsController extends BaseController
     public function actionUpdate()
     {
         return $this->ajaxSuccess();
+    }
+
+
+
+    public function actionGetComment()
+    {
+        $id = (int) $this->get('id');
+
+        $comment = Comments::findById($id);
+
+        return $this->ajaxSuccess($comment);
     }
 
 
