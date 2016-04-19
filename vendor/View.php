@@ -93,9 +93,9 @@ class View extends BaseComponent
      *
      * @return string
      */
-    public function getHtml()
+    public function getHtml($raw = true)
     {
-        extract($this->getData());
+        extract($this->getData($raw));
 
         ob_start();
 
@@ -114,7 +114,7 @@ class View extends BaseComponent
      * @param $data
      * @throws \Exception
      */
-    public function render($view, $data = [])
+    public function render($view, $data = [], $raw = true)
     {
 
         $templatePath = implode(DIRECTORY_SEPARATOR, [$this->getViewDirectory(), $view.'.php']);
@@ -125,7 +125,7 @@ class View extends BaseComponent
 
         $partialView->setData($data);
 
-        echo $partialView->getHtml();
+        echo $partialView->getHtml($raw);
     }
 
 

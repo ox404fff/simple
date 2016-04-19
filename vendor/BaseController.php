@@ -135,7 +135,7 @@ abstract class BaseController extends BaseComponent
         $templatePath = $this->getTemplatePath($view);
         $this->contentView->setTemplate($templatePath);
         $this->contentView->setData($data);
-        return $this->contentView->getHtml();
+        return $this->contentView->getHtml(false);
     }
 
 
