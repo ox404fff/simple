@@ -171,11 +171,7 @@ class View extends BaseComponent
      */
     public function escape($value, $recursive = true)
     {
-        if ($recursive && is_array($value)) {
-            return array_map([$this, 'escape'], $value);
-        } else {
-            return htmlentities($value);
-        }
+        return $this->getFormatter()->escapeHtml($value, $recursive);
     }
 
 }

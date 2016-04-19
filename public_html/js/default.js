@@ -52,7 +52,7 @@ var js_default = function(obj) {
             $currentCommentInput.val(id);
             $parentCommentInput.val(0);
 
-            $createCommentForm.attr({action:_params.urls.create});
+            $createCommentForm.attr({action:_params.urls.update});
 
         }).fail(function() {
             alert( "Something wrong, try to reload page" );
@@ -85,8 +85,10 @@ var js_default = function(obj) {
     obj.saveComment = function() {
         var $createCommentForm = $_createCommentPopup.find("form");
         var $parentCommentInput = $(_params.selectors.parentCommentInput);
+        var $currentCommentInput = $(_params.selectors.currentCommentInput);
 
         var parentId = $parentCommentInput.val();
+        var currentId = $currentCommentInput.val();
         var action = $createCommentForm.attr("action");
 
         $.ajax({
@@ -101,22 +103,24 @@ var js_default = function(obj) {
                 var $newForm = $(response.data.html.form).find("form");
                 $createCommentForm.replaceWith($newForm);
 
-                if (response.data.created) {
+                if (response.data.saved) {
 
-                    if (_params.isRemoveEmptyAfterCreated) {
-                        $(_params.selectors.empty).remove();
-                        _params.isRemoveEmptyAfterCreated = 0;
-                    }
+                    _refreshControlsAfterCreate();
 
-                    if (_params.isShowCreateBtnAfterCreated) {
-                        $(_params.selectors.create).fadeIn(500);
-                        _params.isShowCreateBtnAfterCreated = 0;
-                    }
+                    if (currentId != 0) {
 
-                    if (parentId != 0) {
-                        obj.showChilds(null, parentId, response.data.createdId);
+                        var $currentCommentContainer = $("#js-comment-" + currentId);
+
+                        $currentCommentContainer.find(".js-comment-title:first").html(response.data.comment.name);
+                        $currentCommentContainer.find(".js-comment-text:first").html(response.data.comment.message);
+
                     } else {
-                        $_commentsContainer.prepend(response.data.html.comment);
+
+                        if (parentId != 0) {
+                            obj.showChilds(null, parentId, response.data.createdId);
+                        } else {
+                            $_commentsContainer.prepend(response.data.html.comment);
+                        }
                     }
 
                     $_createCommentPopup.modal("hide");
@@ -131,7 +135,6 @@ var js_default = function(obj) {
         });
 
     };
-
 
     obj.loadMore = function(el, fromId) {
         var $el = $(el);
@@ -189,7 +192,20 @@ var js_default = function(obj) {
 
     };
 
+
     var _backupLabel;
+
+    var _refreshControlsAfterCreate = function() {
+        if (_params.isRemoveEmptyAfterCreated) {
+            $(_params.selectors.empty).remove();
+            _params.isRemoveEmptyAfterCreated = 0;
+        }
+
+        if (_params.isShowCreateBtnAfterCreated) {
+            $(_params.selectors.create).fadeIn(500);
+            _params.isShowCreateBtnAfterCreated = 0;
+        }
+    };
 
     var _startLoading = function($el) {
         if ($el != null) {

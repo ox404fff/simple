@@ -81,7 +81,7 @@ class Comments extends BaseModel
      * @return array
      * @throws \Exception
      */
-    public static function getChildComments($parentId, $tree = false)
+    public static function getChildComments($parentId)
     {
         $parent = self::findById($parentId);
 
@@ -95,13 +95,11 @@ class Comments extends BaseModel
             ':id_left' => $parent['id_left'],
         ];
 
-        $result =  self::queryAll(
+        return self::queryAll(
             sprintf('SELECT * '.'FROM `%s` as t WHERE '.implode(' AND ', $wheres).' ORDER BY t.id_left ASC',
                 self::$tableName
             ), $binds
         );
-
-        return $tree ? self::_createTreeFromArrayByLevels($result) : $result;
 
     }
 
@@ -212,6 +210,27 @@ class Comments extends BaseModel
 
 
     /**
+     * Update data in comment
+     *
+     * @param $id
+     * @param $name
+     * @param $commentText
+     */
+    public static function update($id, $name, $commentText)
+    {
+        return self::exec(sprintf(
+                'UPDATE `%s` as t '.
+                'SET t.name = :name, t.message = :message '.
+                'WHERE t.id = :id AND is_deleted = 0', self::$tableName), [
+                    ':id'      => $id,
+                    ':name'    => $name,
+                    ':message' => $commentText,
+            ]
+        );
+    }
+
+
+    /**
      * Update right and left ids for child nodes
      *
      * @param $parentRightKey
@@ -267,7 +286,7 @@ class Comments extends BaseModel
      * @throws \Exception
      * @return array
      */
-    public static function _insertNewComment($parentRightKey, $newCommentLevel, $name, $commentText)
+    private static function _insertNewComment($parentRightKey, $newCommentLevel, $name, $commentText)
     {
         $newComment = [
             'id_right'       => $parentRightKey + 1,
@@ -290,37 +309,6 @@ class Comments extends BaseModel
         $newComment['id'] = self::getLastInsertId();
 
         return $newComment;
-    }
-
-
-    /**
-     * Create nested array from db result
-     *
-     * @param $list
-     * @param null $level
-     * @return array
-     */
-    private static function _createTreeFromArrayByLevels(&$list, &$index = 0, $level = null)
-    {
-        $result = [];
-        if (is_null($level)) {
-            $level = current($list)['level'];
-        }
-        while($node = current($list)) {
-            if ($node['level'] == $level) {
-                $result[$index] = $node;
-                $index ++;
-            } elseif ($node['level'] > $level) {
-                $result[$index - 1]['items'] = self::_createTreeFromArrayByLevels($list, $index, $node['level']);;
-            } else {
-                prev($list);
-                break;
-            }
-            next($list);
-        }
-
-
-        return $result;
     }
 
 

@@ -3,7 +3,9 @@
 namespace controllers;
 
 use models\Comments;
+use vendor\Application;
 use vendor\BaseController;
+use vendor\HttpException;
 
 class CommentsController extends BaseController
 {
@@ -59,7 +61,9 @@ class CommentsController extends BaseController
 
         $root = Comments::getRoot($parentId);
         $countNodesInRoot = Comments::getCountChildComments($root['id_left'], $root['id_right']);
-        $commentsList = Comments::getChildComments($parentId, true);
+        $commentsList = Comments::getChildComments($parentId);
+
+        $commentsList = $this->_createTreeFromArrayByLevels($commentsList);
 
         $listHtml = $this->getContent('listTree', [
             'commentsList' => $commentsList,
@@ -73,7 +77,32 @@ class CommentsController extends BaseController
     }
 
 
+    /**
+     * @return bool
+     * @throws HttpException
+     */
+    public function actionUpdate()
+    {
+        $commentId = (int) $this->post('current-comment-id');
+
+        $comment = Comments::findById($commentId);
+
+        if (empty($comment)) {
+            throw new HttpException(404);
+        }
+
+        return $this->_form($comment);
+
+    }
+
+
     public function actionCreate()
+    {
+        return $this->_form();
+    }
+
+
+    private function _form($comment = null)
     {
         $parentId = (int) $this->post('parent-comment-id');
         $title    = trim($this->post('comment-title'));
@@ -90,11 +119,19 @@ class CommentsController extends BaseController
 
             $isValid = $this->validate($data);
             if ($isValid) {
-                $newComment = Comments::appendNewComment($parentId, $title, $message);
-                $createdId = $newComment['id'];
+
+                if (is_null($comment)) {
+                    $comment = Comments::appendNewComment($parentId, $title, $message);
+                    $createdId = $comment['id'];
+                } else {
+                    $comment['name'] = $title;
+                    $comment['message'] = $message;
+                    Comments::update($comment['id'], $comment['name'], $comment['message']);
+                }
+
                 $htmlComment = $this->getContent(empty($parentId) ? 'itemRoot' : 'itemTree', [
-                    'comment' => $newComment,
-                    'style' => 'panel-info'
+                    'comment' => $comment,
+                    'style'   => 'panel-info'
                 ]);
                 $data = [];
             }
@@ -104,8 +141,8 @@ class CommentsController extends BaseController
                     'action' => '/comments/create',
                     'errors' => $this->getErrors(),
                     'values' => array_merge([
-                        'current-comment-id' => (int) trim($this->post('current-comment-id')),
-                        'parent-comment-id' => (int) trim($this->post('parent-comment-id'))],
+                            'current-comment-id' => (int) trim($this->post('current-comment-id')),
+                            'parent-comment-id' => (int) trim($this->post('parent-comment-id'))],
                         $data
                     )
                 ]
@@ -116,8 +153,9 @@ class CommentsController extends BaseController
                     'comment' => $htmlComment,
                     'form'    => $htmlForm,
                 ],
+                'comment'     => Application::getInstance()->formatter->escapeHtml($comment),
                 'createdId'   => $createdId,
-                'created'     => (int) $isValid,
+                'saved'     => (int) $isValid,
                 'message'     => 'Comment successfully created!'
             ]);
 
@@ -127,18 +165,19 @@ class CommentsController extends BaseController
     }
 
 
-    public function actionUpdate()
-    {
-        return $this->ajaxSuccess();
-    }
-
-
-
+    /**
+     * @return bool
+     * @throws HttpException
+     */
     public function actionGetComment()
     {
         $id = (int) $this->get('id');
 
         $comment = Comments::findById($id);
+
+        if (empty($comment)) {
+            throw new HttpException(404);
+        }
 
         return $this->ajaxSuccess($comment);
     }
@@ -186,6 +225,38 @@ class CommentsController extends BaseController
     protected function getErrors()
     {
         return $this->errors;
+    }
+
+
+
+    /**
+     * Create nested array from db result
+     *
+     * @param $list
+     * @param null $level
+     * @return array
+     */
+    private function _createTreeFromArrayByLevels(&$list, &$index = 0, $level = null)
+    {
+        $result = [];
+        if (is_null($level)) {
+            $level = current($list)['level'];
+        }
+        while($node = current($list)) {
+            if ($node['level'] == $level) {
+                $result[$index] = $node;
+                $index ++;
+            } elseif ($node['level'] > $level) {
+                $result[$index - 1]['items'] = $this->_createTreeFromArrayByLevels($list, $index, $node['level']);;
+            } else {
+                prev($list);
+                break;
+            }
+            next($list);
+        }
+
+
+        return $result;
     }
 
 

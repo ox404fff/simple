@@ -8,7 +8,7 @@
 <div class="panel <?php echo $style ?> level-<?php echo $comment['level'] ?>" id="js-comment-<?php echo $comment['id'] ?>">
     <div class="panel-heading">
         <h3 class="panel-title">
-            <?php echo $comment['name'] ?>
+            <span class="js-comment-title"><?php echo $comment['name'] ?></span>
             <button onclick="js_default.deleteComment(this, <?php echo $comment['id'] ?>)" type="button" class="btn btn-danger btn-xs fl-right m-l_m">
                 Delete
             </button>
@@ -17,7 +17,7 @@
             </button>
         </h3>
     </div>
-    <div class="panel-body">
+    <div class="panel-body js-comment-text">
         <?php echo $comment['message'] ?>
     </div>
     <?php if (isset($comment['items'])): ?>
