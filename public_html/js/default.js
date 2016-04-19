@@ -45,6 +45,7 @@ var js_default = function(obj) {
             $(_params.selectors.commentTitle).val(response.data.name);
             $(_params.selectors.commentText).html(response.data.message);
 
+            $(_params.selectors.popupCommentTitle).html(_params.text.editCommentTitle);
             $(_params.selectors.saveButton).html(_params.text.update);
 
             $createCommentPopup.modal("show");
@@ -54,7 +55,7 @@ var js_default = function(obj) {
             $createCommentForm.attr({action:_params.urls.create});
 
         }).fail(function() {
-            alert( "Something wrong, try to reload the page" );
+            alert( "Something wrong, try to reload page" );
         });
     };
 
@@ -68,6 +69,7 @@ var js_default = function(obj) {
         $(_params.selectors.commentTitle).val("");
         $(_params.selectors.commentText).html("");
 
+        $(_params.selectors.popupCommentTitle).html(_params.text.createCommentTitle);
         $(_params.selectors.saveButton).html(_params.text.create);
 
         parentId = parentId || 0;
@@ -125,7 +127,7 @@ var js_default = function(obj) {
             }
 
         }).fail(function() {
-            alert( "Something wrong, try to reload the page" );
+            alert( "Something wrong, try to reload page" );
         });
 
     };
@@ -148,7 +150,7 @@ var js_default = function(obj) {
             $(_params.selectors.moreCommentsReplace).replaceWith(response.data.html);
 
         }).fail(function() {
-            alert( "Something wrong, try to reload the page" );
+            alert( "Something wrong, try to reload page" );
         });
     };
 
@@ -182,7 +184,7 @@ var js_default = function(obj) {
             }
 
         }).fail(function() {
-            alert( "Something wrong, try to reload the page" );
+            alert( "Something wrong, try to reload page" );
         });
 
     };

@@ -14,7 +14,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                <h4 class="modal-title" id="new-comment">New comment</h4>
+                <h4 class="modal-title" id="js-create-comment-title">New comment</h4>
             </div>
             <div class="modal-body horizontal-form">
                 <form action="<?php echo $action ?>" onsubmit="js_default.saveComment(); return false;">

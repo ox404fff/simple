@@ -54,7 +54,8 @@
             create: "#js-create",
             saveButton: "#js-save-button",
             commentTitle: "#js-comment-title",
-            commentText: "#js-comment-text"
+            commentText: "#js-comment-text",
+            popupCommentTitle: "#js-create-comment-title"
         },
         urls: {
             create: "/comments/create/",
@@ -67,7 +68,9 @@
             loading: "Loading...",
             refresh: "Refresh",
             create: "Add comment",
-            update: "Save"
+            update: "Save",
+            createCommentTitle: "Create new comment",
+            editCommentTitle: "Edit comment"
         },
         isRemoveEmptyAfterCreated: <?php echo (int) ($count == 0) ?>,
         isShowCreateBtnAfterCreated: <?php echo (int) ($count == 0) ?>
