@@ -23,7 +23,8 @@
     <?php if (isset($comment['items'])): ?>
     <div class="js-child-comments p-l_m p-r_m">
         <?php $this->render('listTree', [
-            'commentsList' => $comment['items']
+            'commentsList'  => $comment['items'],
+            'createdNodeId' => null
         ]) ?>
     </div>
     <?php else: ?>

@@ -130,6 +130,19 @@ class Comments extends BaseModel
 
 
     /**
+     * Delete tree
+     *
+     * @param $idLeft
+     * @param $idRight
+     * @return bool
+     */
+    public static function delete($idLeft, $idRight)
+    {
+        return true;
+    }
+
+
+    /**
      * Find root node, by any node id
      *
      * @param $nodeId

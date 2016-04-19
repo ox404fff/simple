@@ -18,7 +18,25 @@ var js_default = function(obj) {
 
 
     obj.deleteComment = function(el, id) {
+        if (confirm(_params.text.confirmDelete)) {
 
+            $.ajax({
+                url: _params.urls.delete,
+                method: "POST",
+                data: {"id": id},
+                dataType: "json"
+            }).done(function(response) {
+
+                var $removingTree = $("#js-comment-" + id.toString());
+
+                $removingTree.slideUp(100);
+
+                _updateCount(response);
+
+            }).fail(function() {
+                alert( "Something wrong, try to reload page" );
+            });
+        }
     };
 
 
@@ -179,9 +197,7 @@ var js_default = function(obj) {
                 var $childContainer = $("#js-comment-" + parentId.toString() + " .js-child-comments");
                 $childContainer.html(response.data.html);
 
-                var $rootCountContainer = $("#js-count-" + response.data.rootId.toString());
-                $rootCountContainer.show();
-                $rootCountContainer.html(_params.text.refresh + " (" + response.data.countNodesInRoot.toString() + ")");
+                _updateCount(response);
 
                 $childContainer.slideDown(100);
             }
@@ -194,6 +210,12 @@ var js_default = function(obj) {
 
 
     var _backupLabel;
+
+    var _updateCount = function(response) {
+        var $rootCountContainer = $("#js-count-" + response.data.rootId.toString());
+        $rootCountContainer.show();
+        $rootCountContainer.html(_params.text.refresh + " (" + response.data.countNodesInRoot.toString() + ")");
+    };
 
     var _refreshControlsAfterCreate = function() {
         if (_params.isRemoveEmptyAfterCreated) {

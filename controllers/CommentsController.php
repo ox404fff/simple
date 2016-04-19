@@ -58,6 +58,7 @@ class CommentsController extends BaseController
     public function actionChilds()
     {
         $parentId = (int) $this->get('parent-id');
+        $createdNodeId = (int) $this->get('new-node-id');
 
         $root = Comments::getRoot($parentId);
         $countNodesInRoot = Comments::getCountChildComments($root['id_left'], $root['id_right']);
@@ -66,7 +67,8 @@ class CommentsController extends BaseController
         $commentsList = $this->_createTreeFromArrayByLevels($commentsList);
 
         $listHtml = $this->getContent('listTree', [
-            'commentsList' => $commentsList,
+            'commentsList'  => $commentsList,
+            'createdNodeId' => $createdNodeId,
         ]);
 
         return $this->ajaxSuccess([
@@ -123,10 +125,12 @@ class CommentsController extends BaseController
                 if (is_null($comment)) {
                     $comment = Comments::appendNewComment($parentId, $title, $message);
                     $createdId = $comment['id'];
+                    $message = 'Comment successfully created!';
                 } else {
                     $comment['name'] = $title;
                     $comment['message'] = $message;
                     Comments::update($comment['id'], $comment['name'], $comment['message']);
+                    $message = 'Comment successfully updated!';
                 }
 
                 $htmlComment = $this->getContent(empty($parentId) ? 'itemRoot' : 'itemTree', [
@@ -153,15 +157,38 @@ class CommentsController extends BaseController
                     'comment' => $htmlComment,
                     'form'    => $htmlForm,
                 ],
-                'comment'     => Application::getInstance()->formatter->escapeHtml($comment),
-                'createdId'   => $createdId,
+                'comment'   => Application::getInstance()->formatter->escapeHtml($comment),
+                'createdId' => $createdId,
                 'saved'     => (int) $isValid,
-                'message'     => 'Comment successfully created!'
+                'message'   => $message
             ]);
 
         } catch (\Exception $e) {
             return $this->ajaxError($e->getMessage());
         }
+    }
+
+
+
+    public function actionDelete()
+    {
+        $id = (int) $this->post('id');
+
+        $comment = Comments::findById($id);
+
+        if (empty($comment)) {
+            throw new HttpException(404);
+        }
+
+        Comments::delete($comment['id_left'], $comment['id_right']);
+
+        $root = Comments::getRoot($id);
+        $countNodesInRoot = Comments::getCountChildComments($root['id_left'], $root['id_right']);
+
+        return $this->ajaxSuccess([
+            'countNodesInRoot' => $countNodesInRoot,
+            'rootId'           => $root['id'],
+        ]);
     }
 
 
@@ -209,8 +236,8 @@ class CommentsController extends BaseController
             $this->errors['comment-text'] = 'Minimum 2 characters';
         }
 
-        if (mb_strlen($data['comment-text']) > 2000) {
-            $this->errors['comment-text'] = 'Minimum 2000 characters';
+        if (mb_strlen($data['comment-text']) > 10000) {
+            $this->errors['comment-text'] = 'Minimum 10000 characters';
         }
 
         return empty($this->errors);

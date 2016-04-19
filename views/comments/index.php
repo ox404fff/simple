@@ -61,6 +61,7 @@
             create: "/comments/create/",
             update: "/comments/update/",
             childs: "/comments/childs/",
+            delete: "/comments/delete/",
             more: "/comments/more/",
             get: "/comments/getComment/"
         },
@@ -70,7 +71,8 @@
             create: "Add comment",
             update: "Save",
             createCommentTitle: "Create new comment",
-            editCommentTitle: "Edit comment"
+            editCommentTitle: "Edit comment",
+            confirmDelete: "Delete comment?"
         },
         isRemoveEmptyAfterCreated: <?php echo (int) ($count == 0) ?>,
         isShowCreateBtnAfterCreated: <?php echo (int) ($count == 0) ?>
