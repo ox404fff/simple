@@ -18,7 +18,7 @@
         </h3>
     </div>
     <div class="panel-body js-comment-text">
-        <?php echo $comment['message'] ?>
+        <?php echo nl2br($comment['message']) ?>
     </div>
     <div class="js-child-comments p-l_m p-r_m" style="display: none"></div>
     <div class="panel-footer">
