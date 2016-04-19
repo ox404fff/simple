@@ -180,10 +180,15 @@ class CommentsController extends BaseController
             throw new HttpException(404);
         }
 
+        $root = Comments::getRoot($id);
+
         Comments::delete($comment['id_left'], $comment['id_right']);
 
-        $root = Comments::getRoot($id);
         $countNodesInRoot = Comments::getCountChildComments($root['id_left'], $root['id_right']);
+
+        if ($root['id'] != $id) {
+            Comments::updateCount($root['id'], $countNodesInRoot);
+        }
 
         return $this->ajaxSuccess([
             'countNodesInRoot' => $countNodesInRoot,

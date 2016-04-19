@@ -130,19 +130,6 @@ class Comments extends BaseModel
 
 
     /**
-     * Delete tree
-     *
-     * @param $idLeft
-     * @param $idRight
-     * @return bool
-     */
-    public static function delete($idLeft, $idRight)
-    {
-        return true;
-    }
-
-
-    /**
      * Find root node, by any node id
      *
      * @param $nodeId
@@ -170,6 +157,72 @@ class Comments extends BaseModel
                 ':id_right' => $node['id_right'],
             ]
         );
+    }
+
+
+    /**
+     * Delete tree
+     *
+     * @param $idLeft
+     * @param $idRight
+     *
+     * @throws \Exception
+     * @return bool
+     */
+    public static function delete($idLeft, $idRight)
+    {
+
+        self::beginTransaction();
+
+        try {
+
+            $result = self::exec(sprintf(
+                'DELETE '.'FROM `%s` '.'WHERE id_left >= :id_left AND id_right <= :id_right', self::$tableName
+                ), [
+                    ':id_left'  => $idLeft,
+                    ':id_right' => $idRight
+                ]
+            );
+
+            if (!$result) {
+                throw new \Exception('Cannot delete comment from database!');
+            }
+
+            $result = self::exec(sprintf(
+                'UPDATE `%s` as t '.
+                'SET t.id_right = t.id_right - (:id_right - :id_left + 1) '.
+                'WHERE t.id_right > :id_right AND :id_left < :id_left', self::$tableName), [
+                    ':id_left'  => $idLeft,
+                    ':id_right' => $idRight
+                ]
+            );
+
+            if (!$result) {
+                throw new \Exception('Cannot delete comment from database!');
+            }
+
+            $result = self::exec(sprintf(
+                    'UPDATE `%s` as t '.
+                    'SET t.id_left = t.id_left - (:id_right - :id_left + 1), t.id_right = t.id_right - (:id_right - :id_left + 1) '.
+                    'WHERE t.id_left > :id_right', self::$tableName), [
+                    ':id_left'  => $idLeft,
+                    ':id_right' => $idRight
+                ]
+            );
+
+            if (!$result) {
+                throw new \Exception('Cannot delete comment from database!');
+            }
+
+            self::commit();
+
+        } catch (\Exception $e) {
+
+            self::rollback();
+
+            throw $e;
+        }
+
     }
 
 
@@ -228,16 +281,39 @@ class Comments extends BaseModel
      * @param $id
      * @param $name
      * @param $commentText
+     *
+     * @return bool
      */
     public static function update($id, $name, $commentText)
     {
         return self::exec(sprintf(
                 'UPDATE `%s` as t '.
                 'SET t.name = :name, t.message = :message '.
-                'WHERE t.id = :id AND is_deleted = 0', self::$tableName), [
+                'WHERE t.id = :id AND t.is_deleted = 0', self::$tableName), [
                     ':id'      => $id,
                     ':name'    => $name,
                     ':message' => $commentText,
+            ]
+        );
+    }
+
+
+    /**
+     * Update count child`s in comment
+     *
+     * @param $id
+     * @param $count
+     *
+     * @return bool
+     */
+    public static function updateCount($id, $count)
+    {
+        return self::exec(sprintf(
+            'UPDATE `%s` as t '.
+            'SET t.count_children = :new_count '.
+            'WHERE t.id = :id', self::$tableName), [
+                ':id'        => $id,
+                ':new_count' => $count,
             ]
         );
     }
@@ -253,7 +329,7 @@ class Comments extends BaseModel
         self::exec(sprintf(
                 'UPDATE `%s` as t '.
                 'SET t.id_left = t.id_left + 2, t.id_right = t.id_right + 2 '.
-                'WHERE t.id_left > :id_right', self::$tableName), [
+                'WHERE t.id_left > :id_right AND t.is_deleted = 0', self::$tableName), [
                 ':id_right' => $parentRightKey,
             ]
         );
@@ -270,7 +346,7 @@ class Comments extends BaseModel
         self::exec(sprintf(
                 'UPDATE `%s` as t '.
                 'SET t.id_right = t.id_right + 2, t.count_children = t.count_children + 1 '.
-                'WHERE t.id_right >= :id_right AND t.id_left < :id_right', self::$tableName), [
+                'WHERE t.id_right >= :id_right AND t.id_left < :id_right AND t.is_deleted = 0', self::$tableName), [
                 ':id_right' => $parentRightKey,
             ]
         );
@@ -284,7 +360,7 @@ class Comments extends BaseModel
      */
     private static function _getMaxRootId()
     {
-        return self::query(sprintf('SELECT '.'MAX(t.id_right) as id_right from %s as t', self::$tableName));
+        return self::query(sprintf('SELECT '.'MAX(t.id_right) as id_right from %s as t WHERE t.is_deleted = 0', self::$tableName));
     }
 
 
