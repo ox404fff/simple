@@ -208,7 +208,6 @@ var js_default = function(obj) {
 
     };
 
-
     var _backupLabel;
 
     var _updateCount = function(response) {

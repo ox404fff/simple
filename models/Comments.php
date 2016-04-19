@@ -38,7 +38,7 @@ class Comments extends BaseModel
     {
         return self::query(
             sprintf('SELECT * '.
-                'FROM `%s` as t WHERE t.id = :id AND is_deleted = 0%s', self::$tableName, $lock ? ' FOR UPDATE' : ''
+                'FROM `%s` as t WHERE t.id = :id%s', self::$tableName, $lock ? ' FOR UPDATE' : ''
             ), [
                 ':id' => $id
             ]
@@ -55,7 +55,7 @@ class Comments extends BaseModel
      */
     public static function getRootLevelComments($toId = null, $limit = 50)
     {
-        $wheres = ['t.level = 0', 't.is_deleted = 0'];
+        $wheres = ['t.level = 0'];
         $binds = [];
 
         if (!is_null($toId)){
@@ -89,7 +89,7 @@ class Comments extends BaseModel
             throw new \Exception('Parent node is not found');
         }
 
-        $wheres = ['t.id_left > :id_left', 't.id_right < :id_right', 't.is_deleted = 0'];
+        $wheres = ['t.id_left > :id_left', 't.id_right < :id_right'];
         $binds = [
             ':id_right' => $parent['id_right'],
             ':id_left' => $parent['id_left'],
@@ -114,7 +114,7 @@ class Comments extends BaseModel
      */
     public static function getCountChildComments($idLeft, $idRight)
     {
-        $wheres = ['t.id_left > :id_left', 't.id_right < :id_right', 't.is_deleted = 0'];
+        $wheres = ['t.id_left > :id_left', 't.id_right < :id_right'];
         $binds = [
             ':id_right' => $idRight,
             ':id_left'  => $idLeft,
@@ -150,7 +150,7 @@ class Comments extends BaseModel
         }
 
         return self::query(
-            sprintf('SELECT * '.'FROM `%s` as t WHERE t.id_left <= :id_left AND t.id_right >= :id_right AND level = 0 AND is_deleted = 0 LIMIT 1',
+            sprintf('SELECT * '.'FROM `%s` as t WHERE t.id_left <= :id_left AND t.id_right >= :id_right AND t.level = 0 LIMIT 1',
                 self::$tableName
             ), [
                 ':id_left'  => $node['id_left'],
@@ -226,7 +226,6 @@ class Comments extends BaseModel
     }
 
 
-
     /**
      * Append comment in comments tree
      *
@@ -288,11 +287,12 @@ class Comments extends BaseModel
     {
         return self::exec(sprintf(
                 'UPDATE `%s` as t '.
-                'SET t.name = :name, t.message = :message '.
-                'WHERE t.id = :id AND t.is_deleted = 0', self::$tableName), [
-                    ':id'      => $id,
-                    ':name'    => $name,
-                    ':message' => $commentText,
+                'SET t.name = :name, t.message = :message, t.updated_at = :time_now '.
+                'WHERE t.id = :id', self::$tableName), [
+                    ':id'       => $id,
+                    ':name'     => $name,
+                    ':message'  => $commentText,
+                    ':time_now' => time(),
             ]
         );
     }
@@ -313,7 +313,7 @@ class Comments extends BaseModel
             'SET t.count_children = :new_count '.
             'WHERE t.id = :id', self::$tableName), [
                 ':id'        => $id,
-                ':new_count' => $count,
+                ':new_count' => $count
             ]
         );
     }
@@ -329,7 +329,7 @@ class Comments extends BaseModel
         self::exec(sprintf(
                 'UPDATE `%s` as t '.
                 'SET t.id_left = t.id_left + 2, t.id_right = t.id_right + 2 '.
-                'WHERE t.id_left > :id_right AND t.is_deleted = 0', self::$tableName), [
+                'WHERE t.id_left > :id_right', self::$tableName), [
                 ':id_right' => $parentRightKey,
             ]
         );
@@ -346,7 +346,7 @@ class Comments extends BaseModel
         self::exec(sprintf(
                 'UPDATE `%s` as t '.
                 'SET t.id_right = t.id_right + 2, t.count_children = t.count_children + 1 '.
-                'WHERE t.id_right >= :id_right AND t.id_left < :id_right AND t.is_deleted = 0', self::$tableName), [
+                'WHERE t.id_right >= :id_right AND t.id_left < :id_right', self::$tableName), [
                 ':id_right' => $parentRightKey,
             ]
         );
@@ -360,7 +360,7 @@ class Comments extends BaseModel
      */
     private static function _getMaxRootId()
     {
-        return self::query(sprintf('SELECT '.'MAX(t.id_right) as id_right from %s as t WHERE t.is_deleted = 0', self::$tableName));
+        return self::query(sprintf('SELECT '.'MAX(t.id_right) as id_right from %s as t', self::$tableName));
     }
 
 
@@ -386,7 +386,6 @@ class Comments extends BaseModel
             'count_children' => 0,
             'created_at'     => time(),
             'updated_at'     => time(),
-            'is_deleted'     => 0,
         ];
 
         $result = self::insert($newComment);
